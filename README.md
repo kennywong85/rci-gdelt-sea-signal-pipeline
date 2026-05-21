@@ -52,4 +52,9 @@ For countries with elevated signals, identify the event categories and actor pat
   - Confirmed expected rolling 90-day file window of 8,640 event files.
   - Saved generated local inventory output to data/processed/.
 
-Next: Block 4 — design download manifest and new-file-only ingestion logic.
+- Block 4: Download manifest and new-file-only logic completed.
+  - Built manifest comparing expected rolling-window GDELT files against local files.
+  - Added local file status flags for missing, downloaded-not-extracted, and ready files.
+  - Created foundation for incremental downloading and scheduled refresh.
+
+Next: Block 5 — implement controlled GDELT downloader for missing files.
