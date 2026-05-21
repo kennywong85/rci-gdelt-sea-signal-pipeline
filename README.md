@@ -6,7 +6,7 @@ This project builds a local data engineering pipeline using GDELT 2.0 Events dat
 
 The project is designed as both:
 
-1. A Module 2 data engineering learning scaffold.
+1. A DSAI Module 2 data engineering learning scaffold.
 2. A reusable early Red Cloud Intelligence pipeline prototype.
 
 ## Core Question
