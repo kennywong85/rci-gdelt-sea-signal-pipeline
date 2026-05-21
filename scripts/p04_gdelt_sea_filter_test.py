@@ -235,7 +235,7 @@ def inspect_sea_filter() -> None:
 
     con.close()
 
-    print("\nBlock 2 SEA filter test completed successfully.")
+    print("\nProject Block 4: DuckDB SEA filtering prototype completed successfully.")
 
 
 def main() -> None:

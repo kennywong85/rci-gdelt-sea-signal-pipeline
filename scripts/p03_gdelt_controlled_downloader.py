@@ -184,7 +184,7 @@ def run_controlled_download(
     print("\nUpdated local file status:")
     print(status_counts.to_string(index=False))
 
-    print("\nBlock 5 controlled GDELT downloader completed successfully.")
+    print("\nProject Block 3: controlled GDELT downloader completed successfully.")
 
 
 def main() -> None:

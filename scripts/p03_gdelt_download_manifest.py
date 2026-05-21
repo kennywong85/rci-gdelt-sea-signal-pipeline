@@ -147,7 +147,7 @@ def main() -> None:
     print_manifest_summary(manifest_df, days=args.days)
 
     print(f"\nManifest saved to: {output_path}")
-    print("\nBlock 4 GDELT download manifest completed successfully.")
+    print("\nProject Block 3: GDELT download manifest completed successfully.")
 
 
 if __name__ == "__main__":

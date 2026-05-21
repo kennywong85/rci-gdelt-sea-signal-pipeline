@@ -43,7 +43,7 @@ def load_ready_files_to_raw_table(days: int) -> None:
 
     ready_csv_files = get_ready_csv_files(days=days)
 
-    print("\nBlock 6 raw load plan")
+    print("\nProject Block 5: raw load plan")
     print("---------------------")
     print(f"Rolling window: {days} days")
     print(f"Ready CSV files found: {len(ready_csv_files):,}")
@@ -51,7 +51,7 @@ def load_ready_files_to_raw_table(days: int) -> None:
 
     if not ready_csv_files:
         raise RuntimeError(
-            "No ready CSV files found. Run Block 5 downloader first."
+            "No ready CSV files found. Run Project Block 3 downloader first."
         )
 
     csv_glob_path = ROLLING_RAW_DIR / "*.export.CSV"
@@ -134,7 +134,7 @@ def load_ready_files_to_raw_table(days: int) -> None:
 
     if country_counts.empty:
         print("No SEA rows were loaded. This may happen if the ready file sample is too small.")
-        print("Run Block 5 again with more files, then rerun Block 6.")
+        print("Run Project Block 3 again with more files, then rerun Project Block 5.")
     else:
         print(country_counts.to_string(index=False))
 
@@ -182,7 +182,7 @@ def load_ready_files_to_raw_table(days: int) -> None:
 
     con.close()
 
-    print("\nBlock 6 raw DuckDB load completed successfully.")
+    print("\nProject Block 5: raw DuckDB load completed successfully.")
 
 
 def main() -> None:

@@ -205,7 +205,7 @@ def main() -> None:
     print_inventory_summary(inventory_df, days=args.days)
 
     print(f"\nInventory saved to: {output_path}")
-    print("\nBlock 3 GDELT rolling inventory completed successfully.")
+    print("\nProject Block 2: GDELT rolling inventory completed successfully.")
 
 
 if __name__ == "__main__":

@@ -223,7 +223,7 @@ def main() -> None:
     csv_path = unzip_gdelt_file(zip_path, SMOKE_DIR)
     inspect_with_duckdb(csv_path)
 
-    print("\nBlock 1 smoke test completed successfully.")
+    print("\nProject Block 2: GDELT source smoke test completed successfully.")
 
 
 if __name__ == "__main__":
