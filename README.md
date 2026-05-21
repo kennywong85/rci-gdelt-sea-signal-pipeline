@@ -57,4 +57,10 @@ For countries with elevated signals, identify the event categories and actor pat
   - Added local file status flags for missing, downloaded-not-extracted, and ready files.
   - Created foundation for incremental downloading and scheduled refresh.
 
-Next: Block 5 — implement controlled GDELT downloader for missing files.
+- Block 5: Controlled GDELT downloader completed.
+  - Added new-file-only download logic using the rolling-window manifest.
+  - Added controlled max-file download limit for safe testing.
+  - Added automatic extraction from ZIP to raw CSV.
+  - Confirmed local status updates from missing to ready.
+
+Next: Block 6 — load ready GDELT CSV files into DuckDB raw table.
