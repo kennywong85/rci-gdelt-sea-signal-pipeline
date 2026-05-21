@@ -38,14 +38,20 @@ For countries with elevated signals, identify the event categories and actor pat
 ## Project Status
 
 - Block 0: Project scaffold and environment setup completed.
+  - Created repo structure.
+  - Added README, requirements.txt, .env.example and .gitignore.
+  - Set up project folders for data, database, scripts, dbt, notebooks, outputs, docs and logs.
+
 - Block 1: GDELT source smoke test completed.
   - Confirmed GDELT master file list is reachable.
   - Confirmed latest GDELT 2.0 Events file can be downloaded and unzipped.
   - Confirmed DuckDB can read the raw tab-delimited GDELT event file.
+
 - Block 2: Southeast Asia country filter test completed.
   - Created SEA country lookup file.
   - Confirmed DuckDB can filter GDELT rows using ActionGeo_CountryCode.
   - Confirmed Southeast Asia event signals can be isolated from global GDELT files.
+
 - Block 3: Rolling 90-day GDELT file inventory completed.
   - Built inventory logic from the GDELT master file list.
   - Parsed timestamps from GDELT 2.0 Events filenames.
@@ -63,4 +69,11 @@ For countries with elevated signals, identify the event categories and actor pat
   - Added automatic extraction from ZIP to raw CSV.
   - Confirmed local status updates from missing to ready.
 
-Next: Block 6 — load ready GDELT CSV files into DuckDB raw table.
+- Block 6: DuckDB raw table load completed.
+  - Loaded ready GDELT CSV files into local DuckDB warehouse.
+  - Created metadata.sea_country_lookup reference table.
+  - Created raw.gdelt_events table filtered to Southeast Asia using ActionGeo_CountryCode.
+  - Confirmed raw table is ready for downstream staging and dbt transformation.
+
+Next: Block 7 — initialize dbt project and connect dbt-duckdb to the local warehouse.
+
