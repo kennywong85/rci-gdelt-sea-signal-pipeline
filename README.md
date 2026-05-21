@@ -77,6 +77,7 @@ Current DuckDB tables:
 metadata.sea_country_lookup
 raw.gdelt_events
 staging.stg_gdelt_events
+staging.stg_sea_countries
 ```
 
 ## Current Implementation Status
@@ -252,13 +253,31 @@ dbt/gdelt_sea/
 
 Status: Planned.
 
-Planned work:
+### Block 7: Staging models
 
-- Clean, type and standardise raw GDELT fields.
-- Parse event dates and date-added timestamps.
-- Rename raw GDELT fields into readable snake_case.
-- Standardise Southeast Asia country names/codes.
-- Keep event codes, actor fields, geography fields and metrics needed for analysis.
+Status: Completed.
+
+Completed work:
+
+- Expanded `staging.stg_gdelt_events` into a fuller cleaned and typed staging model.
+- Standardised raw GDELT field names into readable snake_case.
+- Parsed event dates and derived:
+  - `event_week_start`
+  - `event_month_start`
+- Added event classification fields:
+  - `quad_class_label`
+  - `is_conflict_quad`
+  - `is_public_safety_signal`
+- Created `staging.stg_sea_countries` from the Southeast Asia country lookup table.
+- Added dbt source definitions for:
+  - `raw.gdelt_events`
+  - `metadata.sea_country_lookup`
+- Ran `dbt run --select staging` successfully.
+- Ran `dbt test --select staging` successfully.
+- Confirmed 13 dbt tests passed.
+- Confirmed staging row counts:
+  - `staging.stg_gdelt_events`: 457 rows.
+  - `staging.stg_sea_countries`: 11 rows.
 
 ### Block 8: Star schema dimensions and fact table
 
@@ -435,7 +454,7 @@ So far, the project has proven:
 Proceed to:
 
 ```text
-Block 7: Staging models
+Block 8: Star schema dimensions and fact table
 ```
 
-This will move the project from raw ingestion into the ELT transformation layer.
+

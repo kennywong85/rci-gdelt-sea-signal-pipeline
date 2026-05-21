@@ -7,9 +7,15 @@ sources:
       - name: gdelt_events
         description: "Raw Southeast Asia-filtered GDELT event rows loaded from local CSV files."
 
+  - name: metadata
+    schema: metadata
+    tables:
+      - name: sea_country_lookup
+        description: "Lookup table mapping Southeast Asian country names to GDELT action geography country codes."
+
 models:
   - name: stg_gdelt_events
-    description: "Cleaned and typed staging model for Southeast Asia GDELT event signals."
+    description: "Cleaned, typed and lightly standardised staging model for Southeast Asia GDELT event signals."
     columns:
       - name: global_event_id
         description: "GDELT global event identifier."
@@ -20,6 +26,12 @@ models:
         description: "Date of the event parsed from SQLDATE."
         tests:
           - not_null
+
+      - name: event_week_start
+        description: "Week start date derived from event_date."
+
+      - name: event_month_start
+        description: "Month start date derived from event_date."
 
       - name: sea_country_name
         description: "Standardised Southeast Asia country name from lookup table."
@@ -36,7 +48,66 @@ models:
         tests:
           - not_null
 
+      - name: event_base_code
+        description: "GDELT/CAMEO event base code."
+
       - name: event_root_code
         description: "GDELT/CAMEO root event code."
+        tests:
+          - not_null
+
+      - name: quad_class
+        description: "GDELT QuadClass. 1 = verbal cooperation, 2 = material cooperation, 3 = verbal conflict, 4 = material conflict."
+
+      - name: quad_class_label
+        description: "Human-readable label for quad_class."
+
+      - name: is_conflict_quad
+        description: "Boolean flag for verbal or material conflict QuadClass values."
+
+      - name: is_public_safety_signal
+        description: "Boolean flag for selected event root codes relevant to public-safety-style monitoring."
+
+      - name: num_mentions
+        description: "Number of mentions reported by GDELT."
+
+      - name: num_sources
+        description: "Number of sources reported by GDELT."
+
+      - name: num_articles
+        description: "Number of articles reported by GDELT."
+
+      - name: avg_tone
+        description: "Average tone score reported by GDELT."
+
+      - name: source_file
+        description: "Local GDELT source file read by DuckDB."
+
+      - name: loaded_at_utc
+        description: "Timestamp when the raw row was loaded into DuckDB."
+
+  - name: stg_sea_countries
+    description: "Cleaned staging model for Southeast Asia country lookup values."
+    columns:
+      - name: sea_country_key
+        description: "Simple generated key for Southeast Asia country rows."
+        tests:
+          - not_null
+          - unique
+
+      - name: sea_country_name
+        description: "Southeast Asia country name."
+        tests:
+          - not_null
+          - unique
+
+      - name: action_geo_country_code
+        description: "GDELT/FIPS action geography country code."
+        tests:
+          - not_null
+          - unique
+
+      - name: region_name
+        description: "Region label. Fixed as Southeast Asia."
         tests:
           - not_null
