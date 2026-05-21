@@ -37,4 +37,14 @@ For countries with elevated signals, identify the event categories and actor pat
 
 ## Project Status
 
-Block 0: Project scaffold and environment setup.
+- Block 0: Project scaffold and environment setup completed.
+- Block 1: GDELT source smoke test completed.
+  - Confirmed GDELT master file list is reachable.
+  - Confirmed latest GDELT 2.0 Events file can be downloaded and unzipped.
+  - Confirmed DuckDB can read the raw tab-delimited GDELT event file.
+- Block 2: Southeast Asia country filter test completed.
+  - Created SEA country lookup file.
+  - Confirmed DuckDB can filter GDELT rows using ActionGeo_CountryCode.
+  - Confirmed Southeast Asia event signals can be isolated from global GDELT files.
+
+Next: Block 3 — design and build the rolling 90-day GDELT file inventory logic.
