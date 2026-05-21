@@ -281,18 +281,35 @@ Completed work:
 
 ### Block 8: Star schema dimensions and fact table
 
-Status: Planned.
+Status: Completed.
 
-Planned work:
+Completed work:
 
-- Build dimensional warehouse tables:
-  - `dim_date`
-  - `dim_country`
-  - `dim_event_code`
-  - `dim_actor`
-  - optional `dim_geo`
-- Build central fact table:
-  - `fact_event_signal`
+- Created star schema mart models:
+  - `marts.dim_date`
+  - `marts.dim_country`
+  - `marts.dim_event_code`
+  - `marts.dim_actor`
+  - `marts.fact_event_signal`
+- Built `fact_event_signal` as the central fact table with one row per GDELT event signal.
+- Linked fact rows to date, country, event code and actor dimensions.
+- Preserved core GDELT measures:
+  - `event_count`
+  - `num_mentions`
+  - `num_sources`
+  - `num_articles`
+  - `avg_tone`
+  - `goldstein_scale`
+- Ran `dbt run --select marts` successfully.
+- Ran `dbt test --select marts` successfully.
+- Confirmed 22 dbt mart tests passed.
+- Confirmed marts row counts:
+  - `marts.dim_date`: 4 rows.
+  - `marts.dim_country`: 11 rows.
+  - `marts.dim_event_code`: 56 rows.
+  - `marts.dim_actor`: 176 rows.
+  - `marts.fact_event_signal`: 457 rows.
+- Confirmed the warehouse now has raw, staging and marts layers.
 
 ### Block 9: Analysis marts for two use cases
 
@@ -454,7 +471,8 @@ So far, the project has proven:
 Proceed to:
 
 ```text
-Block 8: Star schema dimensions and fact table
+Block 9: Analysis marts for two use cases
 ```
 
+This will create use-case-specific mart tables for regional spike monitoring and event/actor profile analysis.
 

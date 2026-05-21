@@ -1,0 +1,118 @@
+version: 2
+
+models:
+  - name: dim_date
+    description: "Date dimension built from event dates in the staging GDELT event data."
+    columns:
+      - name: date_key
+        description: "Integer date key in YYYYMMDD format."
+        tests:
+          - not_null
+          - unique
+
+      - name: event_date
+        description: "Calendar date."
+        tests:
+          - not_null
+          - unique
+
+  - name: dim_country
+    description: "Southeast Asia country dimension."
+    columns:
+      - name: country_key
+        description: "Country surrogate key from the staging SEA country lookup."
+        tests:
+          - not_null
+          - unique
+
+      - name: country_name
+        description: "Country name."
+        tests:
+          - not_null
+          - unique
+
+      - name: action_geo_country_code
+        description: "GDELT action geography country code."
+        tests:
+          - not_null
+          - unique
+
+  - name: dim_event_code
+    description: "GDELT/CAMEO event code dimension based on observed event codes."
+    columns:
+      - name: event_code_key
+        description: "GDELT event code used as the event code key."
+        tests:
+          - not_null
+          - unique
+
+      - name: event_root_code
+        description: "GDELT root event code."
+
+      - name: quad_class
+        description: "GDELT QuadClass."
+
+      - name: quad_class_label
+        description: "Human-readable QuadClass label."
+
+  - name: dim_actor
+    description: "Actor dimension combining Actor1 and Actor2 values from staged GDELT events."
+    columns:
+      - name: actor_key
+        description: "Generated actor key based on actor code, name, country code and actor type fields."
+        tests:
+          - not_null
+          - unique
+
+      - name: actor_name
+        description: "Actor name from GDELT where available."
+
+      - name: actor_country_code
+        description: "Actor country code where available."
+
+  - name: fact_event_signal
+    description: "Central fact table with one row per Southeast Asia GDELT event signal."
+    columns:
+      - name: event_signal_key
+        description: "Primary key for the event signal, using GDELT global event ID."
+        tests:
+          - not_null
+          - unique
+
+      - name: global_event_id
+        description: "GDELT global event identifier."
+        tests:
+          - not_null
+          - unique
+
+      - name: date_key
+        description: "Foreign key to dim_date."
+        tests:
+          - not_null
+
+      - name: country_key
+        description: "Foreign key to dim_country."
+        tests:
+          - not_null
+
+      - name: event_code_key
+        description: "Foreign key to dim_event_code."
+        tests:
+          - not_null
+
+      - name: event_count
+        description: "Event count measure. Always 1 per event signal row."
+        tests:
+          - not_null
+
+      - name: num_mentions
+        description: "Number of mentions reported by GDELT."
+
+      - name: num_sources
+        description: "Number of sources reported by GDELT."
+
+      - name: num_articles
+        description: "Number of articles reported by GDELT."
+
+      - name: avg_tone
+        description: "Average tone reported by GDELT."
