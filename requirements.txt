@@ -1,0 +1,11 @@
+duckdb
+pandas
+requests
+sqlalchemy
+duckdb-engine
+dbt-core
+dbt-duckdb
+jupyter
+ipykernel
+matplotlib
+streamlit

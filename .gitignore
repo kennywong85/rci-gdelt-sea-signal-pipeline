@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.venv/
+venv/
+
+# Environment / secrets
+.env
+*.env
+
+# Raw and processed data
+data/raw/*
+!data/raw/.gitkeep
+!data/raw/gdelt_events/
+data/raw/gdelt_events/*
+!data/raw/gdelt_events/.gitkeep
+
+data/processed/*
+!data/processed/.gitkeep
+
+# Local warehouse files
+db/*.duckdb
+db/*.duckdb.wal
+!db/.gitkeep
+
+# Logs
+logs/*
+!logs/.gitkeep
+
+# Generated outputs
+outputs/figures/*
+!outputs/figures/.gitkeep
+outputs/tables/*
+!outputs/tables/.gitkeep
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+.vscode/
