@@ -46,5 +46,10 @@ For countries with elevated signals, identify the event categories and actor pat
   - Created SEA country lookup file.
   - Confirmed DuckDB can filter GDELT rows using ActionGeo_CountryCode.
   - Confirmed Southeast Asia event signals can be isolated from global GDELT files.
+- Block 3: Rolling 90-day GDELT file inventory completed.
+  - Built inventory logic from the GDELT master file list.
+  - Parsed timestamps from GDELT 2.0 Events filenames.
+  - Confirmed expected rolling 90-day file window of 8,640 event files.
+  - Saved generated local inventory output to data/processed/.
 
-Next: Block 3 — design and build the rolling 90-day GDELT file inventory logic.
+Next: Block 4 — design download manifest and new-file-only ingestion logic.
