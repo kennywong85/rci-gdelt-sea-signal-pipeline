@@ -4,7 +4,7 @@ import argparse
 import requests
 import duckdb
 
-from block_01_gdelt_smoke_test import GDELT_EVENT_COLUMNS
+from p02_gdelt_source_smoke_test import GDELT_EVENT_COLUMNS
 
 
 # -----------------------------

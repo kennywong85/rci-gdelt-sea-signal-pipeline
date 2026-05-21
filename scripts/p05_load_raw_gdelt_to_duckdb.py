@@ -2,8 +2,8 @@ from pathlib import Path
 import argparse
 import duckdb
 
-from block_01_gdelt_smoke_test import GDELT_EVENT_COLUMNS
-from block_04_gdelt_download_manifest import build_download_manifest, ROLLING_RAW_DIR
+from p02_gdelt_source_smoke_test import GDELT_EVENT_COLUMNS
+from p03_gdelt_download_manifest import build_download_manifest, ROLLING_RAW_DIR
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]

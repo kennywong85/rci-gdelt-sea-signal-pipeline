@@ -126,8 +126,8 @@ Completed work:
 Related live scripts:
 
 ```text
-scripts/block_01_gdelt_smoke_test.py
-scripts/block_03_gdelt_90day_inventory.py
+scripts/p02_gdelt_source_smoke_test.py
+scripts/p02_gdelt_90day_inventory.py
 ```
 
 ### Block 3: Raw download and landing zone
@@ -156,8 +156,8 @@ Current sample state:
 Related live scripts:
 
 ```text
-scripts/block_04_gdelt_download_manifest.py
-scripts/block_05_gdelt_controlled_downloader.py
+scripts/p03_gdelt_download_manifest.py
+scripts/p03_gdelt_controlled_downloader.py
 ```
 
 ### Block 4: DuckDB file-query and SEA filtering prototype
@@ -181,7 +181,7 @@ data/lookup/sea_country_codes.csv
 Related live script:
 
 ```text
-scripts/block_02_gdelt_sea_filter_test.py
+scripts/p04_gdelt_sea_filter_test.py
 ```
 
 ### Block 5: Load raw table and ingestion metadata into DuckDB
@@ -219,7 +219,7 @@ raw.gdelt_events
 Related live script:
 
 ```text
-scripts/block_06_load_raw_gdelt_to_duckdb.py
+scripts/p05_load_raw_gdelt_to_duckdb.py
 ```
 
 Remaining work:
@@ -414,12 +414,12 @@ These are ignored through `.gitignore`.
 ## Current Scripts
 
 ```text
-scripts/block_01_gdelt_smoke_test.py
-scripts/block_02_gdelt_sea_filter_test.py
-scripts/block_03_gdelt_90day_inventory.py
-scripts/block_04_gdelt_download_manifest.py
-scripts/block_05_gdelt_controlled_downloader.py
-scripts/block_06_load_raw_gdelt_to_duckdb.py
+scripts/p02_gdelt_source_smoke_test.py
+scripts/p04_gdelt_sea_filter_test.py
+scripts/p02_gdelt_90day_inventory.py
+scripts/p03_gdelt_download_manifest.py
+scripts/p03_gdelt_controlled_downloader.py
+scripts/p05_load_raw_gdelt_to_duckdb.py
 ```
 
 ## Current Learning Summary

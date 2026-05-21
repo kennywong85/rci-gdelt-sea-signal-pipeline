@@ -2,7 +2,7 @@ from pathlib import Path
 import argparse
 import pandas as pd
 
-from block_03_gdelt_90day_inventory import build_event_file_inventory
+from p02_gdelt_90day_inventory import build_event_file_inventory
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]

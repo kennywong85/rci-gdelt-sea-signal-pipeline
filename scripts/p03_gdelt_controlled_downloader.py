@@ -5,7 +5,7 @@ import time
 import requests
 import pandas as pd
 
-from block_04_gdelt_download_manifest import build_download_manifest, ROLLING_RAW_DIR
+from p03_gdelt_download_manifest import build_download_manifest, ROLLING_RAW_DIR
 
 
 def download_one_file(file_url: str, output_path: Path, timeout: int = 120) -> bool:
