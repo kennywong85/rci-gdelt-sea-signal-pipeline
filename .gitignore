@@ -38,3 +38,9 @@ outputs/tables/*
 .DS_Store
 Thumbs.db
 .vscode/
+
+# dbt local artifacts
+dbt/gdelt_sea/target/
+dbt/gdelt_sea/dbt_packages/
+dbt/gdelt_sea/logs/
+dbt/gdelt_sea/profiles.yml

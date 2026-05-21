@@ -76,6 +76,7 @@ Current DuckDB tables:
 ```text
 metadata.sea_country_lookup
 raw.gdelt_events
+staging.stg_gdelt_events
 ```
 
 ## Current Implementation Status
@@ -231,20 +232,14 @@ Remaining work:
 
 ### Block 6: dbt-duckdb project setup
 
-Status: Next.
+Status: Completed.
 
-Planned work:
+Completed work:
 
-- Initialise dbt project under:
+- Initialised dbt project under:
 
 ```text
 dbt/gdelt_sea/
-```
-
-- Configure dbt-duckdb to connect to:
-
-```text
-db/gdelt_sea.duckdb
 ```
 
 - Create `profiles.yml.example`.
@@ -440,7 +435,7 @@ So far, the project has proven:
 Proceed to:
 
 ```text
-Block 6: dbt-duckdb project setup
+Block 7: Staging models
 ```
 
 This will move the project from raw ingestion into the ELT transformation layer.

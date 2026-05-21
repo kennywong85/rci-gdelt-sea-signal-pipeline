@@ -1,0 +1,8 @@
+gdelt_sea:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: ../../db/gdelt_sea.duckdb
+      schema: main
+      threads: 1

@@ -1,0 +1,42 @@
+version: 2
+
+sources:
+  - name: raw
+    schema: raw
+    tables:
+      - name: gdelt_events
+        description: "Raw Southeast Asia-filtered GDELT event rows loaded from local CSV files."
+
+models:
+  - name: stg_gdelt_events
+    description: "Cleaned and typed staging model for Southeast Asia GDELT event signals."
+    columns:
+      - name: global_event_id
+        description: "GDELT global event identifier."
+        tests:
+          - not_null
+
+      - name: event_date
+        description: "Date of the event parsed from SQLDATE."
+        tests:
+          - not_null
+
+      - name: sea_country_name
+        description: "Standardised Southeast Asia country name from lookup table."
+        tests:
+          - not_null
+
+      - name: action_geo_country_code
+        description: "GDELT action geography country code where the event took place."
+        tests:
+          - not_null
+
+      - name: event_code
+        description: "GDELT/CAMEO event code."
+        tests:
+          - not_null
+
+      - name: event_root_code
+        description: "GDELT/CAMEO root event code."
+        tests:
+          - not_null
