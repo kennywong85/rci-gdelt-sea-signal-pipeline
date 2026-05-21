@@ -1,0 +1,12 @@
+country_name,gdelt_fips_code,notes
+Singapore,SN,
+Malaysia,MY,
+Indonesia,ID,
+Thailand,TH,
+Vietnam,VM,
+Philippines,RP,
+Myanmar,BM,GDELT/FIPS may use Burma code
+Cambodia,CB,
+Laos,LA,
+Brunei,BX,
+Timor-Leste,TT,May appear as East Timor in some older coding references
