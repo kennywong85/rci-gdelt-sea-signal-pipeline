@@ -109,6 +109,175 @@ Local Streamlit dashboard
 ├── README.md
 └── requirements.txt
 
+## Quickstart: Run Locally
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/kennywong85/rci-gdelt-sea-signal-pipeline.git
+cd rci-gdelt-sea-signal-pipeline
+```
+
+### 2. Activate Environment
+
+This project was developed using the `elt` conda environment.
+
+```bash
+conda activate elt
+```
+
+Install dependencies if needed:
+
+```bash
+pip install -r requirements.txt
+```
+
+### 3. Configure dbt Profile
+
+Create a local dbt profile from the example file:
+
+```bash
+cp dbt/gdelt_sea/profiles.yml.example dbt/gdelt_sea/profiles.yml
+```
+
+The local `profiles.yml` connects dbt to:
+
+```text
+db/gdelt_sea.duckdb
+```
+
+The real `profiles.yml` should stay local and should not be committed.
+
+### 4. Run the Data Ingestion Pipeline
+
+Run source discovery and inventory scripts:
+
+```bash
+python scripts/p02_01_gdelt_source_smoke_test.py
+python scripts/p02_02_gdelt_90day_inventory.py --days 90
+```
+
+Create the download manifest:
+
+```bash
+python scripts/p03_01_gdelt_download_manifest.py --days 90
+```
+
+Download a controlled sample of GDELT files:
+
+```bash
+python scripts/p03_02_gdelt_controlled_downloader.py --days 90 --max-files 14 --order latest
+```
+
+Run the SEA filtering prototype if needed:
+
+```bash
+python scripts/p04_01_gdelt_sea_filter_test.py
+```
+
+Load the raw SEA-filtered GDELT rows into DuckDB:
+
+```bash
+python scripts/p05_01_load_raw_gdelt_to_duckdb.py --days 90
+```
+
+### 5. Run dbt Models and Tests
+
+```bash
+cd dbt/gdelt_sea
+
+dbt debug --profiles-dir .
+dbt run --profiles-dir .
+dbt test --profiles-dir .
+```
+
+Expected final data quality result for the current controlled sample:
+
+```text
+PASS: 60
+WARN: 0
+ERROR: 0
+TOTAL: 60
+```
+
+Return to project root:
+
+```bash
+cd ../..
+```
+
+### 6. Run the Notebook Analysis
+
+Open and run:
+
+```text
+notebooks/block_11_analysis.ipynb
+```
+
+Use the `Python (elt)` kernel.
+
+If the kernel is not available, register it:
+
+```bash
+conda activate elt
+python -m pip install ipykernel
+python -m ipykernel install --user --name elt --display-name "Python (elt)"
+```
+
+### 7. Run the Local Streamlit Dashboard
+
+```bash
+streamlit run dashboard/app.py
+```
+
+If the `streamlit` command is not found:
+
+```bash
+python -m streamlit run dashboard/app.py
+```
+
+Open the local URL shown in the terminal, usually:
+
+```text
+http://localhost:8501
+```
+
+## Current Scripts
+
+### Source Discovery and Inventory
+
+```text
+scripts/p02_01_gdelt_source_smoke_test.py
+scripts/p02_02_gdelt_90day_inventory.py
+```
+
+### Download Manifest and Controlled Downloader
+
+```text
+scripts/p03_01_gdelt_download_manifest.py
+scripts/p03_02_gdelt_controlled_downloader.py
+```
+
+### DuckDB File Query and Raw Loading
+
+```text
+scripts/p04_01_gdelt_sea_filter_test.py
+scripts/p05_01_load_raw_gdelt_to_duckdb.py
+```
+
+### Notebook Analysis
+
+```text
+scripts/p11_01_create_analysis_notebook.py
+notebooks/block_11_analysis.ipynb
+```
+
+### Dashboard
+
+```text
+dashboard/app.py
+```
+
 ## Current Implementation Status
 
 The formal implementation plan uses broader project blocks. Our live coding work used smaller prototype scripts, especially for the early ingestion pipeline. The status below is aligned to the latest implementation plan stages.
@@ -478,17 +647,6 @@ outputs/
 
 These are ignored through `.gitignore`.
 
-## Current Scripts
-
-```text
-scripts/p02_01_gdelt_source_smoke_test.py
-scripts/p04_01_gdelt_sea_filter_test.py
-scripts/p02_02_gdelt_90day_inventory.py
-scripts/p03_01_gdelt_download_manifest.py
-scripts/p03_02_gdelt_controlled_downloader.py
-scripts/p05_01_load_raw_gdelt_to_duckdb.py
-```
-
 ## Current Learning Summary
 
 So far, the project has proven:
@@ -501,6 +659,84 @@ So far, the project has proven:
 6. DuckDB can read raw GDELT files directly.
 7. Southeast Asia filtering works using `ActionGeo_CountryCode`.
 8. SEA-filtered rows can be loaded into a DuckDB raw table.
+
+## Optional Extension Roadmap
+
+The following blocks are optional future enhancements. The core MVP is completed at Block 12.
+
+### Block 13: Spark distributed batch demonstration
+
+Planned work:
+
+- Create a controlled Spark demo notebook.
+- Read a manageable subset of raw GDELT files.
+- Apply SEA filtering and basic aggregation.
+- Compare Spark distributed batch processing against the DuckDB core pipeline.
+
+### Block 14: One-command orchestration runner
+
+Planned work:
+
+- Create `scripts/run_pipeline.py`.
+- Chain extraction, raw loading, dbt build/test and quality checks into one repeatable command.
+
+### Block 15: Local scheduled refresh
+
+Planned work:
+
+- Use Windows Task Scheduler or WSL cron.
+- Schedule local refresh after the one-command pipeline is stable.
+
+### Block 16: Documentation and architecture diagrams
+
+Planned work:
+
+- Write architecture, data lineage, data dictionary and schema justification docs.
+- Create architecture diagrams.
+
+### Block 17: Final packaging and presentation readiness
+
+Planned work:
+
+- Clean repo.
+- Confirm no large generated files are committed.
+- Prepare final project story, limitations and backup submission materials.
+
+### Block 18: BigQuery public dataset smoke test
+
+Planned / end-of-project demo.
+
+Planned work:
+
+- Revisit GDELT BigQuery access after the core CSV/DuckDB pipeline works.
+- Run a small smoke-test query against the public GDELT dataset if setup permits.
+- Keep this as a learning extension, not the core pipeline.
+
+### Block 19: BigQuery versus CSV/DuckDB comparison
+
+Planned / end-of-project comparison.
+
+Planned work:
+
+- Compare the BigQuery route against the local CSV/DuckDB route.
+- Explain trade-offs:
+  - managed cloud warehouse convenience
+  - local reproducibility
+  - cost/control considerations
+  - ingestion learning value
+  - scale and performance implications
+
+## Generated Files and Git Policy
+
+The following are generated or local files and should not normally be committed:
+
+```text
+data/raw/
+data/processed/
+db/*.duckdb
+db/*.duckdb.wal
+logs/
+outputs/
 
 ## Next Step
 
