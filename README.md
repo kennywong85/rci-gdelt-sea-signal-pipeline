@@ -359,21 +359,46 @@ Completed work:
 
 ### Block 11: Notebook analysis
 
-Status: Planned.
+Status: Completed.
 
-Planned work:
+Completed work:
 
-- Build Jupyter notebook that reads from marts.
-- Produce tables and charts for the two agreed use cases.
+- Created analysis notebook:
+  - `notebooks/block_11_analysis.ipynb`
+- Created notebook generator script:
+  - `scripts/p11_01_create_analysis_notebook.py`
+- Queried completed analysis marts from DuckDB.
+- Produced analysis outputs under `outputs/`.
+- Covered both project use cases:
+  - Regional spike monitoring.
+  - Country event and actor profile analysis.
+- Confirmed notebook runs successfully using the `Python (elt)` kernel.
+- Confirmed summary metrics:
+  - `event_rows`: 457
+  - `countries_in_fact`: 9
+  - `event_codes_in_fact`: 56
+  - `actors_in_dim_actor`: 176
 
 ### Block 12: Simple Streamlit dashboard
 
-Status: Planned / optional.
+Status: Completed.
 
-Planned work:
+Completed work:
 
-- Build a thin local dashboard after notebook outputs are stable.
-- Keep dashboard simple: country selector, date selector, weekly signal trend, top event categories and actor patterns.
+- Created local Streamlit dashboard:
+  - `dashboard/app.py`
+- Dashboard reads from local DuckDB database:
+  - `db/gdelt_sea.duckdb`
+- Dashboard uses marts-layer outputs for:
+  - Pipeline summary metrics.
+  - Regional spike monitoring.
+  - Country event profile.
+  - Country actor profile.
+- Added country filter for simple stakeholder exploration.
+- Added limitations section to frame GDELT as a media-coded signal source.
+- Confirmed dashboard runs locally using:
+  - `streamlit run dashboard/app.py`
+- Confirmed browser refresh and country filter interactions work without crashing.
 
 ### Block 13: Spark distributed batch demonstration
 
@@ -491,7 +516,7 @@ So far, the project has proven:
 Proceed to:
 
 ```text
-Block 11: Notebook analysis
+Project pit stop: loose-end review and Blocks 0–12 defence walkthrough
 ```
 
-This will use the completed marts to produce analysis tables and charts for the two project use cases.
+Before continuing to optional Spark, orchestration and scheduling blocks, the next step is to review loose ends and create a clear explanation of how Blocks 0–12 fit together.
