@@ -1,0 +1,89 @@
+version: 2
+
+models:
+  - name: mart_regional_spike_monitoring
+    description: "Weekly country-level mart for monitoring regional GDELT event signal spikes across Southeast Asia."
+    columns:
+      - name: country_key
+        description: "Foreign key to dim_country."
+        tests:
+          - not_null
+
+      - name: country_name
+        description: "Country name."
+        tests:
+          - not_null
+
+      - name: week_start_date
+        description: "Week start date for the aggregated event signals."
+        tests:
+          - not_null
+
+      - name: event_signal_count
+        description: "Number of GDELT event signal rows for the country-week."
+        tests:
+          - not_null
+
+      - name: spike_flag
+        description: "Simple spike monitoring label based on week-on-week change."
+
+  - name: mart_country_event_profile
+    description: "Country-event profile mart showing dominant event codes and event classes by Southeast Asian country."
+    columns:
+      - name: country_key
+        description: "Foreign key to dim_country."
+        tests:
+          - not_null
+
+      - name: country_name
+        description: "Country name."
+        tests:
+          - not_null
+
+      - name: event_code_key
+        description: "Foreign key to dim_event_code."
+        tests:
+          - not_null
+
+      - name: event_signal_count
+        description: "Number of event signals for the country-event-code combination."
+        tests:
+          - not_null
+
+      - name: country_event_rank
+        description: "Rank of event code within each country by event signal count."
+        tests:
+          - not_null
+
+  - name: mart_country_actor_profile
+    description: "Country-actor profile mart showing actors most frequently appearing in GDELT event signals by country."
+    columns:
+      - name: country_key
+        description: "Foreign key to dim_country."
+        tests:
+          - not_null
+
+      - name: country_name
+        description: "Country name."
+        tests:
+          - not_null
+
+      - name: actor_key
+        description: "Foreign key to dim_actor."
+        tests:
+          - not_null
+
+      - name: actor_position
+        description: "Whether the actor appeared as Actor 1 or Actor 2 in GDELT."
+        tests:
+          - not_null
+
+      - name: actor_event_signal_count
+        description: "Number of event signals involving the actor in the country."
+        tests:
+          - not_null
+
+      - name: country_actor_rank
+        description: "Rank of actor within each country by event signal count."
+        tests:
+          - not_null

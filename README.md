@@ -313,14 +313,26 @@ Completed work:
 
 ### Block 9: Analysis marts for two use cases
 
-Status: Planned.
+Status: Completed.
 
-Planned work:
+Completed work:
 
-- Build mart tables for:
-  - regional spike monitoring
-  - country/event profile
-  - country/actor profile
+- Created use-case-specific analysis mart models:
+  - `marts.mart_regional_spike_monitoring`
+  - `marts.mart_country_event_profile`
+  - `marts.mart_country_actor_profile`
+- Built `mart_regional_spike_monitoring` for weekly country-level event signal monitoring.
+- Built `mart_country_event_profile` for identifying dominant event codes and event classes by country.
+- Built `mart_country_actor_profile` for identifying frequently appearing actors by country.
+- Added simple week-on-week spike logic using prior-week comparison.
+- Added country-level event ranking logic.
+- Added country-level actor ranking logic.
+- Ran `dbt run` successfully for the analysis marts.
+- Ran `dbt test` successfully for the analysis marts.
+- Confirmed analysis mart row counts:
+  - `marts.mart_regional_spike_monitoring`: 11 rows.
+  - `marts.mart_country_event_profile`: 150 rows.
+  - `marts.mart_country_actor_profile`: 304 rows.
 
 ### Block 10: Data quality tests
 
@@ -471,8 +483,7 @@ So far, the project has proven:
 Proceed to:
 
 ```text
-Block 9: Analysis marts for two use cases
+Block 10: Data quality tests
 ```
 
-This will create use-case-specific mart tables for regional spike monitoring and event/actor profile analysis.
-
+This will strengthen the project with broader dbt and custom quality checks across raw, staging, marts and analysis outputs.
