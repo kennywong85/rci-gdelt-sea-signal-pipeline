@@ -13,42 +13,54 @@ The project is designed as both:
 
 How can public-safety stakeholders monitor evolving conflict and disorder signals across Southeast Asia using regularly refreshed open news-event data?
 
+## Important Data Framing
+
+GDELT is used as a media-coded event signal source.
+
+This project should not present GDELT as a verified ground-truth incident database. Outputs should use cautious language such as:
+
+- signals
+- media-coded events
+- event signal volume
+- possible spike
+- areas for further investigation
+
+This project is a data engineering and signal-monitoring prototype, not an operational intelligence system.
+
 ## Scope
 
 - Source: GDELT 2.0 Events files
 - Geography: Southeast Asia
-- Time window: Rolling 90 days
+- Time window design: Rolling 90 days
+- Current build mode: Controlled local sample
 - Warehouse: DuckDB
 - ELT: dbt + dbt-duckdb
-- Orchestration: Local scheduled refresh
 - Analysis: Python / Jupyter
-- Optional presentation layer: Streamlit dashboard
-- Optional technical demonstrations:
+- Presentation layer: Local Streamlit dashboard
+- Optional extension areas:
   - Spark batch-processing notebook
+  - Local orchestration runner
+  - Local scheduled refresh
   - BigQuery public dataset smoke test / comparison
 
 ## Primary Use Cases
 
 ### Use Case 1: Regional Spike Monitoring
 
-Identify which Southeast Asian countries show rising or unusual public-safety-related event signals.
+Identify which Southeast Asian countries show rising or unusual public-safety-related event signal volume.
 
 ### Use Case 2: Event and Actor Profile
 
 For countries with elevated signals, identify the event categories and actor patterns that dominate.
 
-## Important Data Framing
+## Current MVP Status
 
-GDELT is used as a media-coded event signal source.
+Core MVP completed through Block 12.
 
-This project should not present GDELT as a verified ground-truth incident database. Outputs should use cautious language such as "signals", "media-coded events", "event signal volume", and "areas for further investigation".
-
-## Current Architecture
-
-Current working flow:
+The completed MVP demonstrates:
 
 ```text
-GDELT 2.0 master file list
+GDELT source discovery
     ↓
 Rolling 90-day file inventory
     ↓
@@ -58,27 +70,44 @@ Controlled downloader
     ↓
 Local raw GDELT CSV files
     ↓
-DuckDB file query
+DuckDB raw table
     ↓
-Southeast Asia filter using ActionGeo_CountryCode
+dbt staging views
     ↓
-DuckDB raw table: raw.gdelt_events
-```
-
-Current local DuckDB database:
+dbt star schema marts
+    ↓
+dbt analysis marts
+    ↓
+dbt data quality tests
+    ↓
+Jupyter notebook analysis
+    ↓
+Local Streamlit dashboard
+## Repository Structure
 
 ```text
-db/gdelt_sea.duckdb
-```
-
-Current DuckDB tables:
-
-```text
-metadata.sea_country_lookup
-raw.gdelt_events
-staging.stg_gdelt_events
-staging.stg_sea_countries
-```
+.
+├── dashboard/
+│   └── app.py
+├── data/
+│   ├── lookup/
+│   ├── processed/
+│   └── raw/
+├── db/
+├── dbt/
+│   └── gdelt_sea/
+├── docs/
+├── logs/
+├── notebooks/
+│   └── block_11_analysis.ipynb
+├── outputs/
+│   ├── figures/
+│   └── tables/
+├── scripts/
+├── .env.example
+├── .gitignore
+├── README.md
+└── requirements.txt
 
 ## Current Implementation Status
 
@@ -97,18 +126,18 @@ Completed work:
 
 ### Block 1: Environment and package setup
 
-Status: Mostly completed.
+Status: Completed for current MVP scope.
 
 Completed work:
 
 - Confirmed use of the `elt` conda environment.
 - Installed/verified core packages including DuckDB, pandas, requests, dbt-core and dbt-duckdb.
-- Confirmed Python scripts can run inside the project.
+- Registered `Python (elt)` as a Jupyter kernel.
+- Confirmed Python scripts and notebooks can run inside the project.
 
-Remaining work:
+Future extension:
 
-- Add fuller setup notes later in documentation.
-- Confirm Spark environment separately when reaching the Spark demo block.
+- Confirm Spark environment separately if continuing to the Spark demo block.
 
 ### Block 2: GDELT source discovery and 90-day file manifest
 
@@ -186,9 +215,9 @@ Related live script:
 scripts/p04_01_gdelt_sea_filter_test.py
 ```
 
-### Block 5: Load raw table and ingestion metadata into DuckDB
+### Block 5: Load raw table into DuckDB
 
-Status: Partially completed.
+Status: Completed for current controlled sample.
 
 Completed work:
 
@@ -196,40 +225,6 @@ Completed work:
 
 ```text
 db/gdelt_sea.duckdb
-```
-
-- Created metadata reference table:
-
-```text
-metadata.sea_country_lookup
-```
-
-- Created raw GDELT event table:
-
-```text
-raw.gdelt_events
-```
-
-- Loaded ready GDELT CSV files into the local DuckDB warehouse.
-- Created `raw.gdelt_events` table filtered to Southeast Asia using `ActionGeo_CountryCode`.
-- Confirmed sample load result:
-  - 14 ready CSV files.
-  - 13,726 global rows read.
-  - 450 Southeast Asia rows loaded into `raw.gdelt_events`.
-- Confirmed raw table is ready for downstream staging and dbt transformation.
-
-Related live script:
-
-```text
-scripts/p05_01_load_raw_gdelt_to_duckdb.py
-```
-
-Remaining work:
-
-- Add proper ingestion metadata tables later:
-  - `metadata.file_manifest`
-  - `metadata.ingestion_runs`
-- Add deduplication strategy for repeated/full refreshes.
 
 ### Block 6: dbt-duckdb project setup
 
@@ -248,10 +243,6 @@ dbt/gdelt_sea/
 - Create first simple staging model selecting from `raw.gdelt_events`.
 - Run `dbt run`.
 - Confirm dbt can create a model inside DuckDB.
-
-### Block 7: Staging models
-
-Status: Planned.
 
 ### Block 7: Staging models
 
