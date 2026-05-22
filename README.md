@@ -336,18 +336,26 @@ Completed work:
 
 ### Block 10: Data quality tests
 
-Status: Planned.
+Status: Completed.
 
-Planned work:
+Completed work:
 
-- Add dbt and custom tests for:
-  - non-null event IDs
-  - unique event IDs in the final fact table
-  - valid dates
-  - SEA country scope
-  - known event codes
-  - non-negative metrics
-  - zero-row pipeline checks
+- Added custom dbt SQL tests under `dbt/gdelt_sea/tests/`.
+- Added row-count reconciliation across raw, staging and fact layers.
+- Added test to detect future event dates.
+- Added test to validate event week/month derivations.
+- Added test to ensure count-like metrics are non-negative.
+- Added test to ensure `event_count` is always 1 in the fact table.
+- Added test to ensure staged events remain within the Southeast Asia country scope.
+- Added test to ensure analysis marts are not empty.
+- Added relationship tests from `fact_event_signal` to dimension tables.
+- Ran full dbt model rebuild successfully using `dbt run --profiles-dir .`.
+- Ran full dbt test suite successfully using `dbt test --profiles-dir .`.
+- Confirmed final data quality result:
+  - PASS: 60
+  - WARN: 0
+  - ERROR: 0
+  - TOTAL: 60
 
 ### Block 11: Notebook analysis
 
@@ -483,7 +491,7 @@ So far, the project has proven:
 Proceed to:
 
 ```text
-Block 10: Data quality tests
+Block 11: Notebook analysis
 ```
 
-This will strengthen the project with broader dbt and custom quality checks across raw, staging, marts and analysis outputs.
+This will use the completed marts to produce analysis tables and charts for the two project use cases.

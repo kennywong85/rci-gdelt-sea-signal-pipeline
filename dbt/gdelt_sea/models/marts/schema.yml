@@ -89,16 +89,25 @@ models:
         description: "Foreign key to dim_date."
         tests:
           - not_null
+          - relationships:
+              to: ref('dim_date')
+              field: date_key
 
       - name: country_key
         description: "Foreign key to dim_country."
         tests:
           - not_null
+          - relationships:
+              to: ref('dim_country')
+              field: country_key
 
       - name: event_code_key
         description: "Foreign key to dim_event_code."
         tests:
           - not_null
+          - relationships:
+              to: ref('dim_event_code')
+              field: event_code_key
 
       - name: event_count
         description: "Event count measure. Always 1 per event signal row."
