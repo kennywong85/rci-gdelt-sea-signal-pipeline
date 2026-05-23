@@ -278,6 +278,12 @@ notebooks/block_11_analysis.ipynb
 dashboard/app.py
 ```
 
+### Spark Demonstration
+
+```text
+scripts/p13_01_spark_batch_demo.py
+```
+
 ## Current Implementation Status
 
 The formal implementation plan uses broader project blocks. Our live coding work used smaller prototype scripts, especially for the early ingestion pipeline. The status below is aligned to the latest implementation plan stages.
@@ -666,12 +672,32 @@ The following blocks are optional future enhancements. The core MVP is completed
 
 ### Block 13: Spark distributed batch demonstration
 
-Planned work:
+Status: Completed as a controlled local Spark demo.
 
-- Create a controlled Spark demo notebook.
-- Read a manageable subset of raw GDELT files.
-- Apply SEA filtering and basic aggregation.
-- Compare Spark distributed batch processing against the DuckDB core pipeline.
+Completed work:
+
+- Created Spark demo script:
+  - `scripts/p13_01_spark_batch_demo.py`
+- Used PySpark in local mode through the `bde` conda environment.
+- Read a small controlled subset of extracted raw GDELT CSV files.
+- Applied the Southeast Asia country lookup filter using Spark DataFrames.
+- Aggregated event signal counts by country.
+- Saved a small generated output to:
+  - `outputs/tables/spark_sea_country_summary.csv`
+- Kept Spark as a demonstration layer, not the core production path.
+
+Environment note:
+
+- Core pipeline uses the `elt` environment.
+- Spark demo uses the `bde` environment.
+- Optional Spark dependency is listed in:
+  - `requirements-spark.txt`
+
+Note:
+
+- The core MVP pipeline remains DuckDB + dbt.
+- The Spark demo is included to demonstrate distributed batch-processing concepts from Module 2.
+- Generated Spark output files remain ignored by Git through `.gitignore`.
 
 ### Block 14: One-command orchestration runner
 
