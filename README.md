@@ -961,11 +961,19 @@ rather than committing large generated data or database files.
 
 ---
 
-## Optional Extension Roadmap
+## Future Improvement Roadmap
 
-The following blocks are optional future extensions beyond the current completed implementation.
+The planned implementation blocks are complete through Block 19.
 
-Blocks 0–17 are already completed and documented under Current Implementation Status.
+Possible future improvements:
+
+- run a full 90-day GDELT ingestion
+- improve the Streamlit dashboard design
+- add richer event classification logic
+- add better actor cleaning
+- create curated sample screenshots for presentation
+- explore BigQuery migration only if collaboration or scale requires it
+- deploy the dashboard only if needed
 
 ### Block 17: Final packaging and presentation readiness
 
@@ -997,29 +1005,44 @@ Completed work:
 
 ### Block 18: BigQuery public dataset smoke test
 
-Status: Optional / planned.
+Status: Completed as an optional cloud warehouse smoke test.
 
-Possible work:
+Completed work:
 
-- Run a small BigQuery public dataset query.
-- Demonstrate BigQuery familiarity separately from the core DuckDB pipeline.
-- Avoid changing the core individual project architecture unless required.
+- Created BigQuery smoke test script:
+  - `scripts/p18_01_bigquery_public_smoke_test.py`
+- Queried a small BigQuery public dataset.
+- Exported generated smoke-test output to:
+  - `outputs/tables/bigquery_public_smoke_test.csv`
+- Added documentation:
+  - `docs/bigquery_smoke_test.md`
 
-### Block 19: BigQuery comparison notes
+Note:
 
-Status: Optional / planned.
+- This does not change the core project architecture.
+- DuckDB remains the core warehouse for the individual GDELT MVP.
+- BigQuery is demonstrated only as an optional cloud query smoke test.
 
-Possible work:
+### Block 19: DuckDB vs BigQuery comparison notes
 
-- Compare DuckDB and BigQuery for:
-  - local individual prototype
+Status: Completed.
+
+Completed work:
+
+- Added comparison notes:
+  - `docs/duckdb_vs_bigquery_comparison.md`
+- Compared DuckDB and BigQuery across:
+  - local individual development
   - group collaboration
-  - cloud warehouse convenience
   - reproducibility
+  - cloud dependency
   - cost/control considerations
-  - ingestion learning value
-  - scale and performance implications
+  - scale and operational complexity
 
+Final position:
+
+- DuckDB is the core local warehouse for the individual MVP.
+- BigQuery is more suitable for shared group collaboration or cloud-scale workflows.
 ---
 
 ## Module 2 Learning Elements Demonstrated
@@ -1068,12 +1091,13 @@ Short defence script:
 
 ## Next Step
 
-Current implementation is complete through Block 17.
+Current implementation is complete through Block 19.
 
 Recommended next work:
 
 - Resume the defence-ready learning journey from Block 7 onward.
 - Review Blocks 7–10 as the dbt modelling and testing bucket.
 - Review Blocks 11–12 as the analysis and dashboard bucket.
-- Review Blocks 13–17 as the extension, documentation and packaging bucket.
-- Keep Blocks 18 and 19 as optional BigQuery comparison or smoke-test extensions.
+- Review Blocks 13–19 as the extension, documentation and packaging bucket.
+- Plan a full 90-day GDELT pull carefully before running it.
+- Improve the Streamlit dashboard design after confirming full-pull performance.
