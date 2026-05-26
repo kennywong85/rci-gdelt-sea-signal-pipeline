@@ -4,7 +4,7 @@
 
 This project is a local data engineering prototype that uses GDELT 2.0 Events data to monitor public-safety-related event signals across Southeast Asia.
 
-The current implementation is complete through **Block 16**.
+The current implementation is complete through **Block 17**.
 
 The core MVP includes:
 
@@ -20,6 +20,8 @@ The core MVP includes:
 - local orchestration runner
 - local scheduled refresh scaffold
 - architecture, lineage, schema and defence documentation
+- final demo checklist
+- presentation outline
 
 This is an individual learning MVP. It prioritises reproducibility, explainability and defensibility over production hardening.
 
@@ -367,6 +369,8 @@ docs/architecture.md
 docs/data_lineage.md
 docs/schema_overview.md
 docs/defence_notes.md
+docs/final_demo_checklist.md
+docs/presentation_outline.md
 ```
 
 ---
@@ -961,20 +965,35 @@ rather than committing large generated data or database files.
 
 The following blocks are optional future extensions beyond the current completed implementation.
 
-Blocks 0–16 are already completed and documented under Current Implementation Status.
+Blocks 0–17 are already completed and documented under Current Implementation Status.
 
 ### Block 17: Final packaging and presentation readiness
 
-Status: Planned.
+Status: Completed.
 
-Planned work:
+Completed work:
 
-- Prepare final presentation storyline.
-- Prepare short project defence script.
-- Prepare block-by-block explanation.
-- Prepare screenshots or sample outputs if required.
-- Confirm README and docs are clean.
-- Confirm GitHub repo is easy to navigate.
+- Added final demo checklist:
+  - `docs/final_demo_checklist.md`
+- Added presentation outline:
+  - `docs/presentation_outline.md`
+- Defined final demo readiness checks for:
+  - Git status
+  - pipeline rerun
+  - dbt run/test
+  - DuckDB warehouse objects
+  - notebook
+  - Streamlit dashboard
+  - documentation
+- Added concise presentation storyline covering:
+  - project purpose
+  - data source
+  - pipeline architecture
+  - DuckDB warehouse
+  - dbt transformation design
+  - analysis marts
+  - limitations
+  - future extensions
 
 ### Block 18: BigQuery public dataset smoke test
 
@@ -1049,10 +1068,12 @@ Short defence script:
 
 ## Next Step
 
-Current implementation is complete through Block 16.
+Current implementation is complete through Block 17.
 
 Recommended next work:
 
-- Review the full implementation journey from Block 0 onward in defence-ready language.
-- Prepare final packaging and presentation readiness under Block 17.
+- Resume the defence-ready learning journey from Block 7 onward.
+- Review Blocks 7–10 as the dbt modelling and testing bucket.
+- Review Blocks 11–12 as the analysis and dashboard bucket.
+- Review Blocks 13–17 as the extension, documentation and packaging bucket.
 - Keep Blocks 18 and 19 as optional BigQuery comparison or smoke-test extensions.
