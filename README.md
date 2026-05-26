@@ -297,6 +297,15 @@ scripts/run_scheduled_refresh.sh
 docs/local_scheduled_refresh.md
 ```
 
+### Documentation
+
+```text
+docs/architecture.md
+docs/data_lineage.md
+docs/schema_overview.md
+docs/defence_notes.md
+```
+
 ## Current Implementation Status
 
 The formal implementation plan uses broader project blocks. Our live coding work used smaller prototype scripts, especially for the early ingestion pipeline. The status below is aligned to the latest implementation plan stages.
@@ -600,22 +609,64 @@ Planned work:
 - Chain extraction, raw loading, dbt build/test and quality checks into one repeatable command.
 
 ### Block 15: Local scheduled refresh
+```
 
-Status: Planned.
+Replace that block with:
 
-Planned work:
+````markdown
+### Block 15: Local scheduled refresh
 
-- Use Windows Task Scheduler or WSL cron.
-- Schedule local refresh after one-command pipeline is stable.
+Status: Completed as a local scheduled refresh scaffold.
+
+Completed work:
+
+- Created local scheduled refresh wrapper:
+  - `scripts/run_scheduled_refresh.sh`
+- Added timestamped pipeline logging to:
+  - `logs/`
+- The wrapper:
+  - activates the `elt` conda environment
+  - runs `scripts/run_pipeline.py`
+  - supports configurable `DAYS`, `MAX_FILES`, and `ORDER`
+  - passes extra command-line arguments through to the pipeline runner
+- Added local scheduling documentation:
+  - `docs/local_scheduled_refresh.md`
+- Included examples for:
+  - safe manual rerun with `--skip-download`
+  - tiny controlled refresh using `MAX_FILES=1`
+  - WSL cron concept
+  - Windows Task Scheduler concept
+
+Note:
+
+- This is a local scheduled refresh scaffold, not production orchestration.
+- The core pipeline still runs locally through DuckDB and dbt.
+- Logs are generated locally and ignored by Git.
 
 ### Block 16: Documentation and architecture diagrams
 
-Status: Planned.
+Status: Completed.
 
-Planned work:
+Completed work:
 
-- Write architecture, data lineage, data dictionary and schema justification docs.
-- Create architecture diagrams.
+- Added architecture documentation:
+  - `docs/architecture.md`
+- Added data lineage documentation:
+  - `docs/data_lineage.md`
+- Added warehouse schema overview:
+  - `docs/schema_overview.md`
+- Added defence notes:
+  - `docs/defence_notes.md`
+- Included Mermaid diagrams for:
+  - high-level architecture
+  - data lineage
+  - warehouse schema layers
+  - star schema relationship overview
+
+Note:
+
+- These documents are intended to make the project easier to explain, defend and hand over.
+- The diagrams are text-based Mermaid diagrams, so they can render directly in GitHub Markdown.
 
 ### Block 17: Final packaging and presentation readiness
 
@@ -759,48 +810,6 @@ Note:
 - It is intended to make the local pipeline repeatable and easier to demonstrate.
 - Local scheduled refresh remains a future extension under Block 15.
 
-### Block 15: Local scheduled refresh
-```
-
-Replace that block with:
-
-````markdown
-### Block 15: Local scheduled refresh
-
-Status: Completed as a local scheduled refresh scaffold.
-
-Completed work:
-
-- Created local scheduled refresh wrapper:
-  - `scripts/run_scheduled_refresh.sh`
-- Added timestamped pipeline logging to:
-  - `logs/`
-- The wrapper:
-  - activates the `elt` conda environment
-  - runs `scripts/run_pipeline.py`
-  - supports configurable `DAYS`, `MAX_FILES`, and `ORDER`
-  - passes extra command-line arguments through to the pipeline runner
-- Added local scheduling documentation:
-  - `docs/local_scheduled_refresh.md`
-- Included examples for:
-  - safe manual rerun with `--skip-download`
-  - tiny controlled refresh using `MAX_FILES=1`
-  - WSL cron concept
-  - Windows Task Scheduler concept
-
-Note:
-
-- This is a local scheduled refresh scaffold, not production orchestration.
-- The core pipeline still runs locally through DuckDB and dbt.
-- Logs are generated locally and ignored by Git.
-
-### Block 16: Documentation and architecture diagrams
-
-Planned work:
-
-- Write architecture, data lineage, data dictionary and schema justification docs.
-- Create architecture diagrams.
-
 ### Block 17: Final packaging and presentation readiness
 
 Planned work:
@@ -847,10 +856,10 @@ outputs/
 
 ## Next Step
 
-Current implementation is complete through Block 15.
+Current implementation is complete through Block 16.
 
 Recommended next work:
 
-- Pause and review the full implementation journey from Block 0 onward.
-- Explain the folder structure, scripts, DuckDB warehouse, dbt models, tests, notebook, dashboard, Spark demo and local refresh wrapper in simple defence-ready language.
-- Optional future extension: Block 16 documentation and architecture diagrams.
+- Review the full implementation journey from Block 0 onward in defence-ready language.
+- Prepare final packaging and presentation readiness under Block 17.
+- Keep Blocks 18 and 19 as optional BigQuery comparison/smoke-test extensions.
