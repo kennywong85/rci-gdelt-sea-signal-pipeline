@@ -290,6 +290,13 @@ scripts/p13_01_spark_batch_demo.py
 scripts/run_pipeline.py
 ```
 
+### Scheduled Refresh
+
+```text
+scripts/run_scheduled_refresh.sh
+docs/local_scheduled_refresh.md
+```
+
 ## Current Implementation Status
 
 The formal implementation plan uses broader project blocks. Our live coding work used smaller prototype scripts, especially for the early ingestion pipeline. The status below is aligned to the latest implementation plan stages.
@@ -753,11 +760,39 @@ Note:
 - Local scheduled refresh remains a future extension under Block 15.
 
 ### Block 15: Local scheduled refresh
+```
 
-Planned work:
+Replace that block with:
 
-- Use Windows Task Scheduler or WSL cron.
-- Schedule local refresh after the one-command pipeline is stable.
+````markdown
+### Block 15: Local scheduled refresh
+
+Status: Completed as a local scheduled refresh scaffold.
+
+Completed work:
+
+- Created local scheduled refresh wrapper:
+  - `scripts/run_scheduled_refresh.sh`
+- Added timestamped pipeline logging to:
+  - `logs/`
+- The wrapper:
+  - activates the `elt` conda environment
+  - runs `scripts/run_pipeline.py`
+  - supports configurable `DAYS`, `MAX_FILES`, and `ORDER`
+  - passes extra command-line arguments through to the pipeline runner
+- Added local scheduling documentation:
+  - `docs/local_scheduled_refresh.md`
+- Included examples for:
+  - safe manual rerun with `--skip-download`
+  - tiny controlled refresh using `MAX_FILES=1`
+  - WSL cron concept
+  - Windows Task Scheduler concept
+
+Note:
+
+- This is a local scheduled refresh scaffold, not production orchestration.
+- The core pipeline still runs locally through DuckDB and dbt.
+- Logs are generated locally and ignored by Git.
 
 ### Block 16: Documentation and architecture diagrams
 
@@ -812,10 +847,10 @@ outputs/
 
 ## Next Step
 
-Current implementation is complete through Block 14.
+Current implementation is complete through Block 15.
 
 Recommended next work:
 
 - Pause and review the full implementation journey from Block 0 onward.
-- Explain the folder structure, scripts, DuckDB warehouse, dbt models, tests, notebook and dashboard in simple defence-ready language.
-- Optional future extension: Block 15 local scheduled refresh.
+- Explain the folder structure, scripts, DuckDB warehouse, dbt models, tests, notebook, dashboard, Spark demo and local refresh wrapper in simple defence-ready language.
+- Optional future extension: Block 16 documentation and architecture diagrams.
