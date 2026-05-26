@@ -1,68 +1,152 @@
 # RCI GDELT SEA Signal Pipeline
 
+## Current MVP Status
+
+This project is a local data engineering prototype that uses GDELT 2.0 Events data to monitor public-safety-related event signals across Southeast Asia.
+
+The current implementation is complete through **Block 16**.
+
+The core MVP includes:
+
+- GDELT source discovery and rolling file inventory
+- controlled raw file download and extraction
+- Southeast Asia country-code filtering
+- local DuckDB analytical warehouse
+- dbt staging models, star schema and analysis marts
+- dbt data quality tests
+- Jupyter notebook analysis
+- local Streamlit dashboard
+- optional Spark batch-processing demonstration
+- local orchestration runner
+- local scheduled refresh scaffold
+- architecture, lineage, schema and defence documentation
+
+This is an individual learning MVP. It prioritises reproducibility, explainability and defensibility over production hardening.
+
+---
+
 ## Project Purpose
 
-This project builds a local data engineering pipeline using GDELT 2.0 Events data to monitor public-safety-related event signals across Southeast Asia.
+This project builds a local data engineering pipeline using **GDELT 2.0 Events** data to monitor media-coded event signals across Southeast Asia.
 
 The project is designed as both:
 
-1. A DSAI Module 2 data engineering learning scaffold.
-2. A reusable early Red Cloud Intelligence pipeline prototype.
+1. a practical Module 2 data engineering project, and  
+2. a prototype pattern for future Red Cloud Intelligence-style open-source intelligence workflows.
 
-## Core Question
+The core question is:
 
-How can public-safety stakeholders monitor evolving conflict and disorder signals across Southeast Asia using regularly refreshed open news-event data?
+> How can public-safety stakeholders monitor evolving conflict and disorder signals across Southeast Asia using regularly refreshed open news-event data?
 
-## Important Data Framing
+Important framing:
 
-GDELT is used as a media-coded event signal source.
+> GDELT is treated as a **media-coded event signal source**, not as a verified ground-truth incident database.
 
-This project should not present GDELT as a verified ground-truth incident database. Outputs should use cautious language such as:
+The outputs should therefore be interpreted as directional signals for monitoring and further investigation, not confirmed incident counts.
 
-- signals
-- media-coded events
-- event signal volume
-- possible spike
-- areas for further investigation
-
-This project is a data engineering and signal-monitoring prototype, not an operational intelligence system.
-
-## Scope
-
-- Source: GDELT 2.0 Events files
-- Geography: Southeast Asia
-- Time window design: Rolling 90 days
-- Current build mode: Controlled local sample
-- Warehouse: DuckDB
-- ELT: dbt + dbt-duckdb
-- Analysis: Python / Jupyter
-- Presentation layer: Local Streamlit dashboard
-- Optional extension areas:
-  - Spark batch-processing notebook
-  - Local orchestration runner
-  - Local scheduled refresh
-  - BigQuery public dataset smoke test / comparison
+---
 
 ## Primary Use Cases
 
 ### Use Case 1: Regional Spike Monitoring
 
-Identify which Southeast Asian countries show rising or unusual public-safety-related event signal volume.
+Monitor weekly country-level event signal volumes across Southeast Asia and flag simple week-on-week spikes.
 
-### Use Case 2: Event and Actor Profile
+Example questions:
 
-For countries with elevated signals, identify the event categories and actor patterns that dominate.
+- Which countries show sudden increases in event signal volume?
+- Which countries show higher conflict-related signal counts?
+- Which signals may warrant closer analyst review?
 
-## Current MVP Status
+### Use Case 2A: Country Event Profile
 
-Core MVP completed through Block 12.
+Profile dominant event codes and event classes by country.
 
-The completed MVP demonstrates:
+Example questions:
+
+- What types of events dominate each country’s signal profile?
+- Which event codes are most frequently observed?
+- Are signals mostly verbal cooperation, verbal conflict, material cooperation or material conflict?
+
+### Use Case 2B: Country Actor Profile
+
+Profile frequently appearing actor labels by country and actor position.
+
+Example questions:
+
+- Which actor labels appear most frequently in a country’s event signals?
+- Are actors appearing as Actor 1 or Actor 2?
+- Which actor labels are associated with conflict or public-safety-related signals?
+
+---
+
+## Scope
+
+Current geographic scope:
+
+- Brunei
+- Cambodia
+- Indonesia
+- Laos
+- Malaysia
+- Myanmar
+- Philippines
+- Singapore
+- Thailand
+- Timor-Leste
+- Vietnam
+
+The project uses `ActionGeo_CountryCode` to scope events by **event location**, not actor nationality.
+
+This means the project asks:
+
+> Where did the event happen?
+
+not:
+
+> Where are the actors from?
+
+---
+
+## High-Level Architecture
+
+```mermaid
+flowchart TD
+    A[GDELT 2.0 master file list] --> B[Rolling 90-day file inventory]
+    B --> C[Download manifest]
+    C --> D[Controlled downloader]
+    D --> E[Local raw GDELT CSV files]
+
+    L[SEA country lookup] --> F[DuckDB raw load]
+    E --> F
+
+    F --> G[(DuckDB warehouse<br/>db/gdelt_sea.duckdb)]
+
+    G --> H[metadata.sea_country_lookup]
+    G --> I[raw.gdelt_events]
+
+    H --> J[dbt staging models]
+    I --> J
+
+    J --> K[dbt star schema marts]
+    K --> M[Analysis marts]
+
+    M --> N[Jupyter notebook analysis]
+    M --> O[Local Streamlit dashboard]
+
+    E --> P[Spark batch demo]
+    L --> P
+    P --> Q[Generated Spark summary output]
+```
+
+---
+
+## Core Data Flow
 
 ```text
-GDELT source discovery
+GDELT master file list
     ↓
-Rolling 90-day file inventory
+Rolling 90-day inventory
     ↓
 Download manifest
     ↓
@@ -70,33 +154,81 @@ Controlled downloader
     ↓
 Local raw GDELT CSV files
     ↓
-DuckDB raw table
+DuckDB raw load with SEA filtering
     ↓
-dbt staging views
+raw.gdelt_events
+    ↓
+dbt staging models
     ↓
 dbt star schema marts
     ↓
-dbt analysis marts
+analysis marts
     ↓
-dbt data quality tests
-    ↓
-Jupyter notebook analysis
-    ↓
-Local Streamlit dashboard
+Jupyter notebook / Streamlit dashboard
+```
+
+---
+
+## Technology Stack
+
+| Layer | Tool | Purpose |
+|---|---|---|
+| Source discovery | Python | Read GDELT master file list and identify expected event files |
+| Raw download | Python | Build manifest, download and extract controlled raw files |
+| Local warehouse | DuckDB | Store SEA-filtered raw rows and downstream warehouse tables |
+| Transformation | dbt + dbt-duckdb | Build staging models, star schema and marts |
+| Testing | dbt tests | Validate not-null, uniqueness and relationship rules |
+| Analysis | Jupyter | Analyse marts and export small evidence outputs |
+| Dashboard | Streamlit | Local dashboard for stakeholder-style exploration |
+| Batch demo | Spark | Optional local distributed batch-processing demonstration |
+| Orchestration | Python / Bash | One-command pipeline runner and local refresh wrapper |
+
+---
+
+## Design Choice: DuckDB as Local Data Warehouse
+
+For this individual prototype, DuckDB acts as both the database engine and the local analytical warehouse.
+
+The warehouse file is:
+
+```text
+db/gdelt_sea.duckdb
+```
+
+DuckDB was selected because it is:
+
+- local and lightweight
+- suitable for analytical SQL
+- simple to use for an individual project
+- easy to connect to Python
+- compatible with dbt through `dbt-duckdb`
+- reproducible without requiring cloud infrastructure
+
+For a multi-user group project, a shared warehouse such as Google BigQuery may be more suitable for collaboration.
+
+---
+
 ## Repository Structure
 
 ```text
-.
+rci-gdelt-sea-signal-pipeline/
 ├── dashboard/
 │   └── app.py
 ├── data/
 │   ├── lookup/
+│   │   └── sea_country_codes.csv
 │   ├── processed/
 │   └── raw/
 ├── db/
+│   └── gdelt_sea.duckdb
 ├── dbt/
 │   └── gdelt_sea/
 ├── docs/
+│   ├── architecture.md
+│   ├── data_lineage.md
+│   ├── schema_overview.md
+│   ├── defence_notes.md
+│   └── local_scheduled_refresh.md
 ├── logs/
 ├── notebooks/
 │   └── block_11_analysis.ipynb
@@ -107,124 +239,54 @@ Local Streamlit dashboard
 ├── .env.example
 ├── .gitignore
 ├── README.md
-└── requirements.txt
+├── requirements.txt
+└── requirements-spark.txt
+```
+
+---
 
 ## Quickstart: Run Locally
 
-### 1. Clone the Repository
-
-```bash
-git clone https://github.com/kennywong85/rci-gdelt-sea-signal-pipeline.git
-cd rci-gdelt-sea-signal-pipeline
-```
-
-### 2. Activate Environment
-
-This project was developed using the `elt` conda environment.
+### 1. Activate the core environment
 
 ```bash
 conda activate elt
+cd ~/code/ntu-sctp/repos/rci-gdelt-sea-signal-pipeline
 ```
 
-Install dependencies if needed:
+### 2. Run the full local pipeline
 
 ```bash
-pip install -r requirements.txt
+python scripts/run_pipeline.py --days 90 --max-files 14
 ```
 
-### 3. Configure dbt Profile
-
-Create a local dbt profile from the example file:
+### 3. Safer rerun using existing local files
 
 ```bash
-cp dbt/gdelt_sea/profiles.yml.example dbt/gdelt_sea/profiles.yml
+python scripts/run_pipeline.py --days 90 --max-files 14 --skip-download
 ```
 
-The local `profiles.yml` connects dbt to:
-
-```text
-db/gdelt_sea.duckdb
-```
-
-The real `profiles.yml` should stay local and should not be committed.
-
-### 4. Run the Data Ingestion Pipeline
-
-Run source discovery and inventory scripts:
-
-```bash
-python scripts/p02_01_gdelt_source_smoke_test.py
-python scripts/p02_02_gdelt_90day_inventory.py --days 90
-```
-
-Create the download manifest:
-
-```bash
-python scripts/p03_01_gdelt_download_manifest.py --days 90
-```
-
-Download a controlled sample of GDELT files:
-
-```bash
-python scripts/p03_02_gdelt_controlled_downloader.py --days 90 --max-files 14 --order latest
-```
-
-Run the SEA filtering prototype if needed:
-
-```bash
-python scripts/p04_01_gdelt_sea_filter_test.py
-```
-
-Load the raw SEA-filtered GDELT rows into DuckDB:
-
-```bash
-python scripts/p05_01_load_raw_gdelt_to_duckdb.py --days 90
-```
-
-### 5. Run dbt Models and Tests
+### 4. Run dbt directly
 
 ```bash
 cd dbt/gdelt_sea
-
 dbt debug --profiles-dir .
 dbt run --profiles-dir .
 dbt test --profiles-dir .
 ```
 
-Expected final data quality result for the current controlled sample:
+Expected test result:
 
 ```text
-PASS: 60
-WARN: 0
-ERROR: 0
-TOTAL: 60
+PASS=60
+WARN=0
+ERROR=0
+TOTAL=60
 ```
 
-Return to project root:
+### 5. Run the local Streamlit dashboard
 
-```bash
-cd ../..
-```
-
-### 6. Run the Notebook Analysis
-
-Open and run:
-
-```text
-notebooks/block_11_analysis.ipynb
-```
-
-Use the `Python (elt)` kernel.
-
-If the kernel is not available, register it:
-
-```bash
-conda activate elt
-python -m pip install ipykernel
-python -m ipykernel install --user --name elt --display-name "Python (elt)"
-```
-
-### 7. Run the Local Streamlit Dashboard
+From project root:
 
 ```bash
 streamlit run dashboard/app.py
@@ -241,6 +303,8 @@ Open the local URL shown in the terminal, usually:
 ```text
 http://localhost:8501
 ```
+
+---
 
 ## Current Scripts
 
@@ -265,17 +329,10 @@ scripts/p04_01_gdelt_sea_filter_test.py
 scripts/p05_01_load_raw_gdelt_to_duckdb.py
 ```
 
-### Notebook Analysis
+### Notebook Creation
 
 ```text
 scripts/p11_01_create_analysis_notebook.py
-notebooks/block_11_analysis.ipynb
-```
-
-### Dashboard
-
-```text
-dashboard/app.py
 ```
 
 ### Spark Demonstration
@@ -297,6 +354,12 @@ scripts/run_scheduled_refresh.sh
 docs/local_scheduled_refresh.md
 ```
 
+### Dashboard
+
+```text
+dashboard/app.py
+```
+
 ### Documentation
 
 ```text
@@ -306,9 +369,159 @@ docs/schema_overview.md
 docs/defence_notes.md
 ```
 
-## Current Implementation Status
+---
 
-The formal implementation plan uses broader project blocks. Our live coding work used smaller prototype scripts, especially for the early ingestion pipeline. The status below is aligned to the latest implementation plan stages.
+## DuckDB Warehouse Objects
+
+The local warehouse is implemented in:
+
+```text
+db/gdelt_sea.duckdb
+```
+
+Current schemas and key objects:
+
+```text
+metadata.sea_country_lookup
+
+raw.gdelt_events
+
+staging.stg_gdelt_events
+staging.stg_sea_countries
+
+marts.dim_date
+marts.dim_country
+marts.dim_event_code
+marts.dim_actor
+marts.fact_event_signal
+
+marts.mart_regional_spike_monitoring
+marts.mart_country_event_profile
+marts.mart_country_actor_profile
+```
+
+---
+
+## Warehouse Layers
+
+### `metadata`
+
+Reference and supporting tables.
+
+Main table:
+
+```text
+metadata.sea_country_lookup
+```
+
+This defines the Southeast Asia country scope and GDELT/FIPS country codes.
+
+### `raw`
+
+SEA-filtered raw GDELT event rows.
+
+Main table:
+
+```text
+raw.gdelt_events
+```
+
+Important note:
+
+`raw.gdelt_events` is raw relative to transformation, but not global-unfiltered raw. It is already scoped to Southeast Asia using `ActionGeo_CountryCode`.
+
+### `staging`
+
+Cleaned, renamed and typed dbt staging models.
+
+Main models:
+
+```text
+staging.stg_gdelt_events
+staging.stg_sea_countries
+```
+
+### `marts`
+
+Star schema and analysis-ready marts.
+
+Main star schema models:
+
+```text
+marts.dim_date
+marts.dim_country
+marts.dim_event_code
+marts.dim_actor
+marts.fact_event_signal
+```
+
+Main analysis marts:
+
+```text
+marts.mart_regional_spike_monitoring
+marts.mart_country_event_profile
+marts.mart_country_actor_profile
+```
+
+---
+
+## Star Schema Overview
+
+```mermaid
+erDiagram
+    DIM_DATE ||--o{ FACT_EVENT_SIGNAL : date_key
+    DIM_COUNTRY ||--o{ FACT_EVENT_SIGNAL : country_key
+    DIM_EVENT_CODE ||--o{ FACT_EVENT_SIGNAL : event_code_key
+    DIM_ACTOR ||--o{ FACT_EVENT_SIGNAL : actor1_key
+    DIM_ACTOR ||--o{ FACT_EVENT_SIGNAL : actor2_key
+
+    DIM_DATE {
+        string date_key
+        date event_date
+        date week_start_date
+        date month_start_date
+    }
+
+    DIM_COUNTRY {
+        int country_key
+        string country_name
+        string action_geo_country_code
+        string region_name
+    }
+
+    DIM_EVENT_CODE {
+        string event_code_key
+        string event_code
+        string event_root_code
+        string quad_class_label
+    }
+
+    DIM_ACTOR {
+        string actor_key
+        string actor_label
+    }
+
+    FACT_EVENT_SIGNAL {
+        string event_signal_key
+        string global_event_id
+        string date_key
+        int country_key
+        string event_code_key
+        string actor1_key
+        string actor2_key
+        int event_count
+        int num_mentions
+        int num_sources
+        int num_articles
+        double avg_tone
+        boolean is_conflict_quad
+        boolean is_public_safety_signal
+    }
+```
+
+---
+
+## Current Implementation Status
 
 ### Block 0: Project setup and repo skeleton
 
@@ -317,71 +530,65 @@ Status: Completed.
 Completed work:
 
 - Created project repository and folder structure.
-- Added README.md, requirements.txt, .env.example and .gitignore.
-- Set up project folders for data, database, scripts, dbt, notebooks, outputs, docs and logs.
-- Confirmed project opens correctly in VS Code / WSL.
+- Added base project files:
+  - `README.md`
+  - `requirements.txt`
+  - `.env.example`
+  - `.gitignore`
+- Established folders for:
+  - scripts
+  - data
+  - database
+  - dbt
+  - notebooks
+  - dashboard
+  - outputs
+  - logs
+  - documentation
 
 ### Block 1: Environment and package setup
-
-Status: Completed for current MVP scope.
-
-Completed work:
-
-- Confirmed use of the `elt` conda environment.
-- Installed/verified core packages including DuckDB, pandas, requests, dbt-core and dbt-duckdb.
-- Registered `Python (elt)` as a Jupyter kernel.
-- Confirmed Python scripts and notebooks can run inside the project.
-
-Future extension:
-
-- Confirm Spark environment separately if continuing to the Spark demo block.
-
-### Block 2: GDELT source discovery and 90-day file manifest
 
 Status: Completed.
 
 Completed work:
 
-- Confirmed GDELT master file list is reachable.
-- Confirmed GDELT 2.0 Events files can be identified using `.export.CSV.zip`.
-- Confirmed latest GDELT 2.0 Events file can be downloaded and unzipped.
-- Confirmed DuckDB can read the raw tab-delimited GDELT event file.
-- Built rolling 90-day file inventory from the GDELT master file list.
-- Parsed timestamps from GDELT 2.0 Events filenames.
-- Confirmed expected rolling 90-day file window of 8,640 event files.
-- Saved generated local inventory output to `data/processed/`.
+- Used the `elt` conda environment for the core pipeline.
+- Confirmed Python, DuckDB, dbt and Streamlit support.
+- Registered `Python (elt)` as a usable notebook kernel.
+- Kept Spark dependency separate under `requirements-spark.txt`.
 
-Related live scripts:
+### Block 2: GDELT source discovery and 90-day inventory
+
+Status: Completed.
+
+Completed work:
+
+- Created GDELT source smoke test.
+- Confirmed GDELT master file list access.
+- Confirmed raw GDELT event file readability.
+- Created rolling 90-day event file inventory logic.
+- Confirmed 90-day expected file universe based on 15-minute GDELT intervals.
+
+Scripts:
 
 ```text
 scripts/p02_01_gdelt_source_smoke_test.py
 scripts/p02_02_gdelt_90day_inventory.py
 ```
 
-### Block 3: Raw download and landing zone
+### Block 3: Download manifest and controlled downloader
 
-Status: Completed for controlled sample download.
+Status: Completed.
 
 Completed work:
 
-- Built download manifest comparing expected rolling-window GDELT files against local files.
-- Added local file status flags:
-  - missing
-  - zip_downloaded_not_extracted
-  - ready
-- Created foundation for incremental downloading and scheduled refresh.
-- Added new-file-only download logic using the rolling-window manifest.
-- Added controlled max-file download limit for safe testing.
-- Added automatic extraction from ZIP to raw CSV.
-- Confirmed repeated runs do not need to redownload already-ready files.
+- Created download manifest logic.
+- Compared expected GDELT files against local file state.
+- Created controlled downloader.
+- Added maximum file safety control.
+- Downloaded and extracted a controlled local sample.
 
-Current sample state:
-
-- 14 GDELT ZIP files downloaded.
-- 14 GDELT CSV files extracted.
-- 14 files marked ready for loading.
-
-Related live scripts:
+Scripts:
 
 ```text
 scripts/p03_01_gdelt_download_manifest.py
@@ -394,19 +601,13 @@ Status: Completed.
 
 Completed work:
 
-- Defined GDELT 2.0 Events column names.
-- Created Southeast Asia country lookup file.
-- Confirmed DuckDB can filter GDELT rows using `ActionGeo_CountryCode`.
-- Confirmed Southeast Asia event signals can be isolated from global GDELT files.
-- Confirmed DuckDB can read raw GDELT files directly without using Polars.
+- Created DuckDB file-query prototype.
+- Read extracted GDELT event CSV files directly.
+- Applied Southeast Asia filtering using `ActionGeo_CountryCode`.
+- Used `data/lookup/sea_country_codes.csv` as explicit country scope.
+- Confirmed SEA-filtered rows could be previewed before warehouse loading.
 
-SEA lookup file:
-
-```text
-data/lookup/sea_country_codes.csv
-```
-
-Related live script:
+Script:
 
 ```text
 scripts/p04_01_gdelt_sea_filter_test.py
@@ -414,14 +615,24 @@ scripts/p04_01_gdelt_sea_filter_test.py
 
 ### Block 5: Load raw table into DuckDB
 
-Status: Completed for current controlled sample.
+Status: Completed.
 
 Completed work:
 
-- Created local DuckDB database:
+- Created local DuckDB warehouse:
+  - `db/gdelt_sea.duckdb`
+- Created metadata table:
+  - `metadata.sea_country_lookup`
+- Created raw event table:
+  - `raw.gdelt_events`
+- Loaded SEA-filtered GDELT event rows into DuckDB.
+- Added basic source traceability fields such as filename and load timestamp.
+
+Script:
 
 ```text
-db/gdelt_sea.duckdb
+scripts/p05_01_load_raw_gdelt_to_duckdb.py
+```
 
 ### Block 6: dbt-duckdb project setup
 
@@ -429,17 +640,19 @@ Status: Completed.
 
 Completed work:
 
-- Initialised dbt project under:
-
-```text
-dbt/gdelt_sea/
-```
-
-- Create `profiles.yml.example`.
-- Run `dbt debug`.
-- Create first simple staging model selecting from `raw.gdelt_events`.
-- Run `dbt run`.
-- Confirm dbt can create a model inside DuckDB.
+- Created dbt project under:
+  - `dbt/gdelt_sea/`
+- Configured dbt-duckdb connection to:
+  - `db/gdelt_sea.duckdb`
+- Added local `profiles.yml.example`.
+- Created source definitions for:
+  - `raw.gdelt_events`
+- Created initial staging model:
+  - `staging.stg_gdelt_events`
+- Confirmed:
+  - `dbt debug`
+  - `dbt run`
+  - `dbt test`
 
 ### Block 7: Staging models
 
@@ -456,16 +669,15 @@ Completed work:
   - `quad_class_label`
   - `is_conflict_quad`
   - `is_public_safety_signal`
-- Created `staging.stg_sea_countries` from the Southeast Asia country lookup table.
-- Added dbt source definitions for:
-  - `raw.gdelt_events`
-  - `metadata.sea_country_lookup`
-- Ran `dbt run --select staging` successfully.
-- Ran `dbt test --select staging` successfully.
-- Confirmed 13 dbt tests passed.
-- Confirmed staging row counts:
-  - `staging.stg_gdelt_events`: 457 rows.
-  - `staging.stg_sea_countries`: 11 rows.
+- Created `staging.stg_sea_countries` from the Southeast Asia country lookup.
+- Added dbt source definitions and staging tests.
+
+Current staging models:
+
+```text
+staging.stg_gdelt_events
+staging.stg_sea_countries
+```
 
 ### Block 8: Star schema dimensions and fact table
 
@@ -479,48 +691,34 @@ Completed work:
   - `marts.dim_event_code`
   - `marts.dim_actor`
   - `marts.fact_event_signal`
-- Built `fact_event_signal` as the central fact table with one row per GDELT event signal.
-- Linked fact rows to date, country, event code and actor dimensions.
-- Preserved core GDELT measures:
-  - `event_count`
-  - `num_mentions`
-  - `num_sources`
-  - `num_articles`
-  - `avg_tone`
-  - `goldstein_scale`
-- Ran `dbt run --select marts` successfully.
-- Ran `dbt test --select marts` successfully.
-- Confirmed 22 dbt mart tests passed.
-- Confirmed marts row counts:
-  - `marts.dim_date`: 4 rows.
-  - `marts.dim_country`: 11 rows.
-  - `marts.dim_event_code`: 56 rows.
-  - `marts.dim_actor`: 176 rows.
-  - `marts.fact_event_signal`: 457 rows.
-- Confirmed the warehouse now has raw, staging and marts layers.
+- Created surrogate-style keys for fact and dimension joins.
+- Converted staged event records into fact rows for analysis.
+- Added dimension and fact tests.
 
-### Block 9: Analysis marts for two use cases
+Current star schema:
+
+```text
+marts.dim_date
+marts.dim_country
+marts.dim_event_code
+marts.dim_actor
+marts.fact_event_signal
+```
+
+### Block 9: Analysis marts
 
 Status: Completed.
 
 Completed work:
 
-- Created use-case-specific analysis mart models:
+- Created analysis marts aligned to the project use cases:
   - `marts.mart_regional_spike_monitoring`
   - `marts.mart_country_event_profile`
   - `marts.mart_country_actor_profile`
-- Built `mart_regional_spike_monitoring` for weekly country-level event signal monitoring.
-- Built `mart_country_event_profile` for identifying dominant event codes and event classes by country.
-- Built `mart_country_actor_profile` for identifying frequently appearing actors by country.
-- Added simple week-on-week spike logic using prior-week comparison.
-- Added country-level event ranking logic.
-- Added country-level actor ranking logic.
-- Ran `dbt run` successfully for the analysis marts.
-- Ran `dbt test` successfully for the analysis marts.
-- Confirmed analysis mart row counts:
-  - `marts.mart_regional_spike_monitoring`: 11 rows.
-  - `marts.mart_country_event_profile`: 150 rows.
-  - `marts.mart_country_actor_profile`: 304 rows.
+- Added simple week-on-week spike monitoring logic.
+- Added country-level event profile outputs.
+- Added country-level actor profile outputs.
+- Confirmed marts build successfully through dbt.
 
 ### Block 10: Data quality tests
 
@@ -528,22 +726,18 @@ Status: Completed.
 
 Completed work:
 
-- Added custom dbt SQL tests under `dbt/gdelt_sea/tests/`.
-- Added row-count reconciliation across raw, staging and fact layers.
-- Added test to detect future event dates.
-- Added test to validate event week/month derivations.
-- Added test to ensure count-like metrics are non-negative.
-- Added test to ensure `event_count` is always 1 in the fact table.
-- Added test to ensure staged events remain within the Southeast Asia country scope.
-- Added test to ensure analysis marts are not empty.
-- Added relationship tests from `fact_event_signal` to dimension tables.
-- Ran full dbt model rebuild successfully using `dbt run --profiles-dir .`.
-- Ran full dbt test suite successfully using `dbt test --profiles-dir .`.
-- Confirmed final data quality result:
-  - PASS: 60
-  - WARN: 0
-  - ERROR: 0
-  - TOTAL: 60
+- Expanded dbt tests across staging, dimensions, fact and marts.
+- Added not-null tests for important fields.
+- Added uniqueness tests for key fields.
+- Added relationship tests between fact and dimension models.
+- Confirmed dbt test result:
+
+```text
+PASS=60
+WARN=0
+ERROR=0
+TOTAL=60
+```
 
 ### Block 11: Notebook analysis
 
@@ -553,67 +747,104 @@ Completed work:
 
 - Created analysis notebook:
   - `notebooks/block_11_analysis.ipynb`
-- Created notebook generator script:
-  - `scripts/p11_01_create_analysis_notebook.py`
-- Queried completed analysis marts from DuckDB.
-- Produced analysis outputs under `outputs/`.
-- Covered both project use cases:
-  - Regional spike monitoring.
-  - Country event and actor profile analysis.
-- Confirmed notebook runs successfully using the `Python (elt)` kernel.
-- Confirmed summary metrics:
-  - `event_rows`: 457
-  - `countries_in_fact`: 9
-  - `event_codes_in_fact`: 56
-  - `actors_in_dim_actor`: 176
+- Used `Python (elt)` kernel.
+- Read analysis marts from DuckDB.
+- Produced summary views for:
+  - pipeline row counts
+  - regional spike monitoring
+  - country event profile
+  - country actor profile
+- Exported small generated outputs into:
+  - `outputs/tables/`
 
-### Block 12: Simple Streamlit dashboard
+### Block 12: Local Streamlit dashboard
 
 Status: Completed.
 
 Completed work:
 
-- Created local Streamlit dashboard:
+- Created local dashboard:
   - `dashboard/app.py`
-- Dashboard reads from local DuckDB database:
-  - `db/gdelt_sea.duckdb`
-- Dashboard uses marts-layer outputs for:
-  - Pipeline summary metrics.
-  - Regional spike monitoring.
-  - Country event profile.
-  - Country actor profile.
-- Added country filter for simple stakeholder exploration.
-- Added limitations section to frame GDELT as a media-coded signal source.
-- Confirmed dashboard runs locally using:
-  - `streamlit run dashboard/app.py`
-- Confirmed browser refresh and country filter interactions work without crashing.
+- Dashboard reads from DuckDB marts.
+- Added country filter.
+- Added sections for:
+  - pipeline summary
+  - regional spike monitoring
+  - country event profile
+  - country actor profile
+- Confirmed dashboard runs locally through:
+
+```bash
+streamlit run dashboard/app.py
+```
 
 ### Block 13: Spark distributed batch demonstration
 
-Status: Planned.
+Status: Completed as a controlled local Spark demo.
 
-Planned work:
+Completed work:
 
-- Create a controlled Spark demo notebook.
-- Read a manageable subset of raw GDELT files.
-- Apply SEA filtering and basic aggregation.
-- Compare Spark distributed batch pattern against the DuckDB core pipeline.
+- Created Spark demo script:
+  - `scripts/p13_01_spark_batch_demo.py`
+- Used PySpark in local mode through the `bde` conda environment.
+- Read a small controlled subset of extracted raw GDELT CSV files.
+- Applied the Southeast Asia country lookup filter using Spark DataFrames.
+- Aggregated event signal counts by country.
+- Saved a small generated output to:
+  - `outputs/tables/spark_sea_country_summary.csv`
+- Kept Spark as a demonstration layer, not the core production path.
+
+Environment note:
+
+- Core pipeline uses the `elt` environment.
+- Spark demo uses the `bde` environment.
+- Optional Spark dependency is listed in:
+  - `requirements-spark.txt`
 
 ### Block 14: One-command orchestration runner
 
-Status: Planned.
+Status: Completed as a local orchestration runner.
 
-Planned work:
+Completed work:
 
-- Create `scripts/run_pipeline.py`.
-- Chain extraction, raw loading, dbt build/test and quality checks into one repeatable command.
+- Created one-command pipeline runner:
+  - `scripts/run_pipeline.py`
+- Added command-line options for:
+  - rolling inventory window using `--days`
+  - controlled download volume using `--max-files`
+  - latest/oldest download ordering using `--order`
+  - skipping download using `--skip-download`
+  - skipping dbt using `--skip-dbt`
+  - including optional smoke tests using `--include-smoke-tests`
+- Confirmed the runner can execute the core local pipeline sequence:
+  - build rolling GDELT inventory
+  - build download manifest
+  - controlled download/extraction
+  - load SEA-filtered rows into DuckDB
+  - run `dbt debug`
+  - run `dbt run`
+  - run `dbt test`
+- Confirmed successful end-to-end run with:
 
-### Block 15: Local scheduled refresh
+```text
+PASS=60
+WARN=0
+ERROR=0
+TOTAL=60
 ```
 
-Replace that block with:
+Example usage:
 
-````markdown
+```bash
+python scripts/run_pipeline.py --days 90 --max-files 14
+```
+
+Safer rerun using existing local files:
+
+```bash
+python scripts/run_pipeline.py --days 90 --max-files 14 --skip-download
+```
+
 ### Block 15: Local scheduled refresh
 
 Status: Completed as a local scheduled refresh scaffold.
@@ -640,7 +871,6 @@ Completed work:
 Note:
 
 - This is a local scheduled refresh scaffold, not production orchestration.
-- The core pipeline still runs locally through DuckDB and dbt.
 - Logs are generated locally and ignored by Git.
 
 ### Block 16: Documentation and architecture diagrams
@@ -668,191 +898,154 @@ Note:
 - These documents are intended to make the project easier to explain, defend and hand over.
 - The diagrams are text-based Mermaid diagrams, so they can render directly in GitHub Markdown.
 
-### Block 17: Final packaging and presentation readiness
+---
 
-Status: Planned.
+## Generated Files and Git Policy
 
-Planned work:
-
-- Clean repo.
-- Confirm no large generated files are committed.
-- Prepare final project story, limitations and backup submission materials.
-
-### Block 18: BigQuery public dataset smoke test
-
-Status: Planned / end-of-project demo.
-
-Planned work:
-
-- Revisit GDELT BigQuery access after the core CSV/DuckDB pipeline works.
-- Run a small smoke-test query against the public GDELT dataset if setup permits.
-- Keep this as a learning extension, not the core pipeline.
-
-### Block 19: BigQuery versus CSV/DuckDB comparison
-
-Status: Planned / end-of-project comparison.
-
-Planned work:
-
-- Compare the BigQuery route against the local CSV/DuckDB route.
-- Explain trade-offs:
-  - managed cloud warehouse convenience
-  - local reproducibility
-  - cost/control considerations
-  - ingestion learning value
-  - scale and performance implications
-
-## Generated Files Not Committed to Git
-
-The following are generated/local files and should not be committed:
+The following files and folders are generated locally and should not normally be committed:
 
 ```text
 data/raw/
 data/processed/
 db/*.duckdb
-db/*.duckdb.wal
 logs/
 outputs/
 ```
 
 These are ignored through `.gitignore`.
 
-## Current Learning Summary
+The repository should track:
 
-So far, the project has proven:
+```text
+source code
+dbt models
+documentation
+configuration templates
+README instructions
+```
 
-1. GDELT source discovery works.
-2. GDELT event file URLs can be identified from the master file list.
-3. A rolling 90-day file inventory can be built.
-4. Missing/local/ready file status can be tracked.
-5. Controlled file download and extraction works.
-6. DuckDB can read raw GDELT files directly.
-7. Southeast Asia filtering works using `ActionGeo_CountryCode`.
-8. SEA-filtered rows can be loaded into a DuckDB raw table.
+The repository should not track:
+
+```text
+large downloaded data files
+generated database files
+generated logs
+generated dashboard/notebook outputs
+temporary local files
+```
+
+For final demonstration evidence, use a small curated folder if needed, such as:
+
+```text
+docs/sample_outputs/
+```
+
+rather than committing large generated data or database files.
+
+---
+
+## Key Limitations
+
+- Current outputs are based on a controlled local sample, not necessarily the full 90-day universe.
+- GDELT is a media-coded event signal source, not verified ground truth.
+- Actor labels and event codes can be noisy and should be interpreted directionally.
+- The spike flag is a simple demonstration rule, not a production alerting model.
+- The Streamlit dashboard is a local demo layer, not a deployed production application.
+- The Spark component is a local demonstration, not the core processing path.
+- The scheduled refresh wrapper is a local scaffold, not production orchestration.
+- The project currently prioritises learning, reproducibility and explainability over production hardening.
+
+---
 
 ## Optional Extension Roadmap
 
-The following blocks are optional future enhancements. The core MVP is completed at Block 12.
+The following blocks are optional future extensions beyond the current completed implementation.
 
-### Block 13: Spark distributed batch demonstration
-
-Status: Completed as a controlled local Spark demo.
-
-Completed work:
-
-- Created Spark demo script:
-  - `scripts/p13_01_spark_batch_demo.py`
-- Used PySpark in local mode through the `bde` conda environment.
-- Read a small controlled subset of extracted raw GDELT CSV files.
-- Applied the Southeast Asia country lookup filter using Spark DataFrames.
-- Aggregated event signal counts by country.
-- Saved a small generated output to:
-  - `outputs/tables/spark_sea_country_summary.csv`
-- Kept Spark as a demonstration layer, not the core production path.
-
-Environment note:
-
-- Core pipeline uses the `elt` environment.
-- Spark demo uses the `bde` environment.
-- Optional Spark dependency is listed in:
-  - `requirements-spark.txt`
-
-Note:
-
-- The core MVP pipeline remains DuckDB + dbt.
-- The Spark demo is included to demonstrate distributed batch-processing concepts from Module 2.
-- Generated Spark output files remain ignored by Git through `.gitignore`.
-
-### Block 14: One-command orchestration runner
-
-Status: Completed as a local orchestration runner.
-
-Completed work:
-
-- Created one-command pipeline runner:
-  - `scripts/run_pipeline.py`
-- Added command-line options for:
-  - rolling inventory window using `--days`
-  - controlled download volume using `--max-files`
-  - latest/oldest download ordering using `--order`
-  - skipping download using `--skip-download`
-  - skipping dbt using `--skip-dbt`
-  - including optional smoke tests using `--include-smoke-tests`
-- Confirmed the runner can execute the core local pipeline sequence:
-  - build rolling GDELT inventory
-  - build download manifest
-  - controlled download/extraction
-  - load SEA-filtered rows into DuckDB
-  - run `dbt debug`
-  - run `dbt run`
-  - run `dbt test`
-- Confirmed successful end-to-end run with:
-  - `PASS=60`
-  - `WARN=0`
-  - `ERROR=0`
-  - `TOTAL=60`
-
-Example usage:
-
-```bash
-python scripts/run_pipeline.py --days 90 --max-files 14
-```
-
-Safer rerun using existing local files:
-
-```bash
-python scripts/run_pipeline.py --days 90 --max-files 14 --skip-download
-```
-
-Note:
-
-- This is a simple local orchestration runner, not a production scheduler.
-- It is intended to make the local pipeline repeatable and easier to demonstrate.
-- Local scheduled refresh remains a future extension under Block 15.
+Blocks 0–16 are already completed and documented under Current Implementation Status.
 
 ### Block 17: Final packaging and presentation readiness
 
+Status: Planned.
+
 Planned work:
 
-- Clean repo.
-- Confirm no large generated files are committed.
-- Prepare final project story, limitations and backup submission materials.
+- Prepare final presentation storyline.
+- Prepare short project defence script.
+- Prepare block-by-block explanation.
+- Prepare screenshots or sample outputs if required.
+- Confirm README and docs are clean.
+- Confirm GitHub repo is easy to navigate.
 
 ### Block 18: BigQuery public dataset smoke test
 
-Planned / end-of-project demo.
+Status: Optional / planned.
 
-Planned work:
+Possible work:
 
-- Revisit GDELT BigQuery access after the core CSV/DuckDB pipeline works.
-- Run a small smoke-test query against the public GDELT dataset if setup permits.
-- Keep this as a learning extension, not the core pipeline.
+- Run a small BigQuery public dataset query.
+- Demonstrate BigQuery familiarity separately from the core DuckDB pipeline.
+- Avoid changing the core individual project architecture unless required.
 
-### Block 19: BigQuery versus CSV/DuckDB comparison
+### Block 19: BigQuery comparison notes
 
-Planned / end-of-project comparison.
+Status: Optional / planned.
 
-Planned work:
+Possible work:
 
-- Compare the BigQuery route against the local CSV/DuckDB route.
-- Explain trade-offs:
-  - managed cloud warehouse convenience
-  - local reproducibility
+- Compare DuckDB and BigQuery for:
+  - local individual prototype
+  - group collaboration
+  - cloud warehouse convenience
+  - reproducibility
   - cost/control considerations
   - ingestion learning value
   - scale and performance implications
 
-## Generated Files and Git Policy
+---
 
-The following are generated or local files and should not normally be committed:
+## Module 2 Learning Elements Demonstrated
 
-```text
-data/raw/
-data/processed/
-db/*.duckdb
-db/*.duckdb.wal
-logs/
-outputs/
+This project demonstrates:
+
+- public dataset source discovery
+- file-based batch ingestion
+- controlled downloader design
+- raw landing zone pattern
+- local analytical warehouse implementation
+- DuckDB SQL workflow
+- dbt source definitions
+- dbt staging models
+- dbt star schema modelling
+- dbt analysis marts
+- dbt data quality tests
+- Jupyter notebook analysis
+- local Streamlit dashboard
+- optional Spark batch-processing demo
+- local one-command orchestration runner
+- local scheduled refresh scaffold
+- architecture and lineage documentation
+- generated file and Git hygiene
+
+---
+
+## Defence Notes
+
+The strongest way to explain the project:
+
+1. Python discovers and downloads GDELT files.
+2. DuckDB acts as the local analytical warehouse.
+3. dbt transforms raw warehouse data into staging models, a star schema and analysis marts.
+4. dbt tests validate the important keys, fields and relationships.
+5. Notebook and Streamlit layers read from the marts.
+6. Spark is included only as an optional distributed batch-processing demonstration.
+7. Local orchestration and refresh scripts make the workflow easier to rerun.
+8. Documentation explains the architecture, lineage, schema and project defence framing.
+
+Short defence script:
+
+> This project follows an ELT pattern. Python discovers and downloads GDELT event files, then loads Southeast Asia-filtered event rows into DuckDB. dbt transforms the raw data into staging models, a star schema and analysis marts, with tests for key fields and relationships. The notebook and dashboard read from the marts to support regional spike monitoring and country-level event and actor profiling. Spark and local scheduling are included as optional demonstrations, while the core MVP remains DuckDB and dbt for simplicity and reproducibility.
+
+---
 
 ## Next Step
 
@@ -862,4 +1055,4 @@ Recommended next work:
 
 - Review the full implementation journey from Block 0 onward in defence-ready language.
 - Prepare final packaging and presentation readiness under Block 17.
-- Keep Blocks 18 and 19 as optional BigQuery comparison/smoke-test extensions.
+- Keep Blocks 18 and 19 as optional BigQuery comparison or smoke-test extensions.
