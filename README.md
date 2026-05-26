@@ -284,6 +284,12 @@ dashboard/app.py
 scripts/p13_01_spark_batch_demo.py
 ```
 
+### Orchestration Runner
+
+```text
+scripts/run_pipeline.py
+```
+
 ## Current Implementation Status
 
 The formal implementation plan uses broader project blocks. Our live coding work used smaller prototype scripts, especially for the early ingestion pipeline. The status below is aligned to the latest implementation plan stages.
@@ -701,10 +707,50 @@ Note:
 
 ### Block 14: One-command orchestration runner
 
-Planned work:
+Status: Completed as a local orchestration runner.
 
-- Create `scripts/run_pipeline.py`.
-- Chain extraction, raw loading, dbt build/test and quality checks into one repeatable command.
+Completed work:
+
+- Created one-command pipeline runner:
+  - `scripts/run_pipeline.py`
+- Added command-line options for:
+  - rolling inventory window using `--days`
+  - controlled download volume using `--max-files`
+  - latest/oldest download ordering using `--order`
+  - skipping download using `--skip-download`
+  - skipping dbt using `--skip-dbt`
+  - including optional smoke tests using `--include-smoke-tests`
+- Confirmed the runner can execute the core local pipeline sequence:
+  - build rolling GDELT inventory
+  - build download manifest
+  - controlled download/extraction
+  - load SEA-filtered rows into DuckDB
+  - run `dbt debug`
+  - run `dbt run`
+  - run `dbt test`
+- Confirmed successful end-to-end run with:
+  - `PASS=60`
+  - `WARN=0`
+  - `ERROR=0`
+  - `TOTAL=60`
+
+Example usage:
+
+```bash
+python scripts/run_pipeline.py --days 90 --max-files 14
+```
+
+Safer rerun using existing local files:
+
+```bash
+python scripts/run_pipeline.py --days 90 --max-files 14 --skip-download
+```
+
+Note:
+
+- This is a simple local orchestration runner, not a production scheduler.
+- It is intended to make the local pipeline repeatable and easier to demonstrate.
+- Local scheduled refresh remains a future extension under Block 15.
 
 ### Block 15: Local scheduled refresh
 
@@ -766,10 +812,10 @@ outputs/
 
 ## Next Step
 
-Proceed to:
+Current implementation is complete through Block 14.
 
-```text
-Project pit stop: loose-end review and Blocks 0–12 defence walkthrough
-```
+Recommended next work:
 
-Before continuing to optional Spark, orchestration and scheduling blocks, the next step is to review loose ends and create a clear explanation of how Blocks 0–12 fit together.
+- Pause and review the full implementation journey from Block 0 onward.
+- Explain the folder structure, scripts, DuckDB warehouse, dbt models, tests, notebook and dashboard in simple defence-ready language.
+- Optional future extension: Block 15 local scheduled refresh.
